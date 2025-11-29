@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SummaryCards from '@/components/Dashboard/SummaryCards';
 import AllocationChart from '@/components/Dashboard/AllocationChart';
+import HistoryChart from '@/components/Dashboard/HistoryChart';
+import JournalSection from '@/components/Dashboard/JournalSection';
 import MarketIndices from '@/components/Dashboard/MarketIndices';
 import TradeForm from '@/components/Trade/TradeForm';
 import TradeList from '@/components/Trade/TradeList';
@@ -12,9 +14,10 @@ export default function Home() {
     const [trades, setTrades] = useState([]);
     const [prices, setPrices] = useState([]);
     const [stats, setStats] = useState({ totalValue: 0, totalInvested: 0, netProfit: 0, roi: 0, assets: [] });
+    const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // 1. Fetch Trades
+    // 1. Fetch Trades & History
     const fetchTrades = async () => {
         try {
             const res = await fetch('/api/trades');
@@ -25,8 +28,19 @@ export default function Home() {
         }
     };
 
+    const fetchHistory = async () => {
+        try {
+            const res = await fetch('/api/history');
+            const data = await res.json();
+            setHistory(data);
+        } catch (error) {
+            console.error('Failed to fetch history', error);
+        }
+    };
+
     useEffect(() => {
         fetchTrades();
+        fetchHistory();
     }, []);
 
     const [exchangeRate, setExchangeRate] = useState(null);
@@ -60,13 +74,32 @@ export default function Home() {
         fetchPrices();
     }, [trades]);
 
-    // 3. Calculate Stats
+    // 3. Calculate Stats & Auto-Save History
     useEffect(() => {
-        if (!loading) {
+        if (!loading && prices.length > 0) {
             const computedStats = calculatePortfolioStats(trades, prices, exchangeRate);
             setStats(computedStats);
+
+            // Auto-save history if totalValue > 0
+            if (computedStats.totalValue > 0) {
+                const today = new Date().toISOString().split('T')[0];
+
+                fetch('/api/history', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: today,
+                        totalValue: computedStats.totalValue,
+                        investedAmount: computedStats.totalInvested
+                    })
+                }).then(res => res.json())
+                    .then(data => {
+                        if (data.history) setHistory(data.history);
+                    })
+                    .catch(err => console.error('Failed to auto-save history', err));
+            }
         }
-    }, [trades, prices, loading]);
+    }, [trades, prices, loading, exchangeRate]);
 
     const handleTradeAdded = (newTrade) => {
         setTrades(prev => [...prev, newTrade]);
@@ -100,6 +133,9 @@ export default function Home() {
                     <p>Investment Dashboard & Journal</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <Link href="/journal" className="btn btn-outline">
+                        📚 일지 보관함
+                    </Link>
                     <Link href="/rebalancing" className="btn btn-outline">
                         ⚖️ 리밸런싱
                     </Link>
@@ -116,13 +152,18 @@ export default function Home() {
                     <AllocationChart assets={stats.assets} />
                 </div>
 
-                {/* Row 2: Market Indices */}
+                <HistoryChart history={history} />
+
+                {/* Row 2: Journal Section */}
+                <JournalSection stats={stats} trades={trades} history={history} />
+
+                {/* Row 3: Market Indices */}
                 <MarketIndices />
 
-                {/* Row 3: Trade Form */}
+                {/* Row 4: Trade Form */}
                 <TradeForm onTradeAdded={handleTradeAdded} />
 
-                {/* Row 4: Trade List */}
+                {/* Row 5: Trade List */}
                 <TradeList
                     trades={trades}
                     prices={prices}

@@ -140,7 +140,7 @@ export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted
                                             style={{ fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                                             onClick={() => setEditingTrade(editingTrade === trade.id ? null : trade.id)}
                                         >
-                                            {trade.ticker}
+                                            {trade.name || trade.ticker}
                                             <span style={{
                                                 fontSize: '0.7rem',
                                                 padding: '2px 6px',
@@ -151,7 +151,7 @@ export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted
                                                 {trade.account === 'General' ? '일반' : (trade.account === 'Pension' ? '연금' : 'IRP')}
                                             </span>
                                         </div>
-                                        {trade.name && <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{trade.name}</div>}
+                                        {trade.name && <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{trade.ticker}</div>}
 
                                         {editingTrade === trade.id && (
                                             <div style={{

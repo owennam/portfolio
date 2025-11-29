@@ -1,12 +1,10 @@
 import yahooFinance from 'yahoo-finance2';
 const yf = new yahooFinance({ suppressNotices: ['yahooSurvey'] });
 
-export async function GET(request) {
-    const { searchParams } = new URL(request.url);
-    // Optional: User's top holdings to fetch specific news for
-    const holdings = searchParams.get('holdings')?.split(',') || [];
-
+export async function POST(request) {
     try {
+        const { holdings, stats, trades, history } = await request.json();
+
         // 1. Fetch Market Indices
         const indices = ['^GSPC', '^IXIC', '^KS11', 'BTC-USD', 'USD/KRW'];
         const marketData = await Promise.all(
@@ -25,24 +23,54 @@ export async function GET(request) {
             })
         );
 
-        // 2. Fetch News (General Market + Holdings)
-        // We'll search for "Stock Market" and specific holdings
-        const newsQueries = ['Stock Market', 'Crypto', ...holdings.slice(0, 3)]; // Limit to top 3 holdings to save time
-        const newsResults = await Promise.all(
-            newsQueries.map(async (query) => {
-                try {
-                    const result = await yf.search(query, { newsCount: 3 });
-                    return { query, news: result.news };
-                } catch (e) {
-                    return { query, news: [] };
+        // 2. Generate Markdown Draft
+        const today = new Date();
+        const todayStr = today.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+        const todayISO = today.toISOString().split('T')[0];
+
+        let markdown = `# 📔 ${todayStr} 투자 일지\n\n`;
+
+        if (stats) {
+            const profitIcon = stats.netProfit > 0 ? '📈' : (stats.netProfit < 0 ? '📉' : '➖');
+
+            // Calculate change from yesterday
+            let changeText = '';
+            if (history && history.length > 0) {
+                // Sort history by date descending
+                const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+                // Find latest entry before today
+                const prevEntry = sortedHistory.find(h => h.date < todayISO);
+
+                if (prevEntry) {
+                    const diff = stats.totalValue - prevEntry.totalValue;
+                    const diffPercent = (diff / prevEntry.totalValue) * 100;
+                    const diffIcon = diff > 0 ? '🔺' : (diff < 0 ? '🔻' : '➖');
+                    changeText = `\n- **전일 대비**: ${diffIcon} ${Math.abs(Math.round(diff)).toLocaleString()}원 (${diffPercent.toFixed(2)}%)`;
                 }
-            })
-        );
+            }
 
-        // 3. Generate Markdown Draft
-        const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+            markdown += `## 💰 내 포트폴리오 현황\n`;
+            markdown += `- **총 자산**: ${Math.round(stats.totalValue).toLocaleString()}원${changeText}\n`;
+            markdown += `- **순수익**: ${profitIcon} ${Math.round(stats.netProfit).toLocaleString()}원 (${stats.roi.toFixed(2)}%)\n`;
+            markdown += `\n`;
+        }
 
-        let markdown = `# 📊 ${today} 투자 일지\n\n`;
+        // Add Trade Log
+        markdown += `## 📝 오늘의 매매 기록\n`;
+        if (trades && trades.length > 0) {
+            const todayTrades = trades.filter(t => t.date === todayISO);
+            if (todayTrades.length > 0) {
+                todayTrades.forEach(t => {
+                    const typeIcon = t.type === 'buy' ? '🔴 매수' : '🔵 매도';
+                    markdown += `- **${typeIcon}**: ${t.name || t.ticker} ${t.quantity}주 (@ ${Number(t.price).toLocaleString()}원)\n`;
+                });
+            } else {
+                markdown += `- 오늘의 매매 내역이 없습니다.\n`;
+            }
+        } else {
+            markdown += `- 오늘의 매매 내역이 없습니다.\n`;
+        }
+        markdown += `\n`;
 
         markdown += `## 🌍 시장 개요\n`;
         marketData.forEach(item => {
@@ -50,20 +78,6 @@ export async function GET(request) {
             const icon = item.changePercent > 0 ? '🟢' : (item.changePercent < 0 ? '🔴' : '⚪');
             markdown += `- **${item.name}**: ${item.price?.toLocaleString()} (${icon} ${item.changePercent?.toFixed(2)}%)\n`;
         });
-
-        markdown += `\n## 📰 주요 뉴스\n`;
-        newsResults.forEach(item => {
-            if (item.news && item.news.length > 0) {
-                markdown += `### ${item.query}\n`;
-                item.news.forEach(news => {
-                    markdown += `- [${news.title}](${news.link})\n`;
-                });
-                markdown += `\n`;
-            }
-        });
-
-        markdown += `## 💭 오늘의 성찰\n`;
-        markdown += `- (여기에 오늘의 매매 원칙을 지켰는지, 감정 상태는 어떠했는지 기록하세요)\n`;
 
         return Response.json({ markdown });
     } catch (error) {
