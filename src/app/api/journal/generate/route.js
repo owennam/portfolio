@@ -110,10 +110,32 @@ export async function POST(request) {
         markdown += `## 📝 오늘의 매매 기록\n`;
         if (trades && trades.length > 0) {
             const todayTrades = trades.filter(t => t.date === todayISO);
+
+            // Fetch currencies for traded assets
+            const tradedTickers = [...new Set(todayTrades.map(t => t.ticker))];
+            const currencyMap = {};
+
+            await Promise.all(tradedTickers.map(async (ticker) => {
+                try {
+                    const quote = await yf.quote(ticker);
+                    currencyMap[ticker] = quote.currency;
+                } catch (e) {
+                    console.error(`Failed to fetch currency for ${ticker}`, e);
+                    currencyMap[ticker] = 'KRW'; // Default to KRW on error
+                }
+            }));
+
             if (todayTrades.length > 0) {
                 todayTrades.forEach(t => {
                     const typeIcon = t.type.toLowerCase() === 'buy' ? '🔴 매수' : '🔵 매도';
                     let profitText = '';
+                    const currency = currencyMap[t.ticker] || 'KRW';
+                    const isUSD = currency === 'USD';
+
+                    const formatPrice = (price) => {
+                        if (isUSD) return `$${Number(price).toLocaleString()}`;
+                        return `${Number(price).toLocaleString()}원`;
+                    };
 
                     if (t.type === 'Sell') {
                         // Calculate Realized Profit
@@ -133,7 +155,14 @@ export async function POST(request) {
                                 const profit = (price - avgPrice) * qty;
                                 const roi = avgPrice > 0 ? (profit / (avgPrice * qty)) * 100 : 0;
                                 const sign = profit > 0 ? '+' : '';
-                                profitText = ` (${sign}${Math.round(profit).toLocaleString()}원, ${roi.toFixed(2)}%)`;
+
+                                // Profit is always calculated in the asset's currency roughly, 
+                                // but for the journal we want to show it in the asset's currency context
+                                // However, usually profit in portfolio is tracked in base currency (KRW).
+                                // But here we are calculating from trade history which presumably has prices in original currency?
+                                // Let's assume trade prices are in original currency.
+
+                                profitText = ` (${sign}${formatPrice(Math.round(profit))}, ${roi.toFixed(2)}%)`;
                                 found = true;
                                 break;
                             }
@@ -148,7 +177,7 @@ export async function POST(request) {
                         }
                     }
 
-                    markdown += `- **${typeIcon}**: ${t.name || t.ticker} ${t.quantity}주 (@ ${Number(t.price).toLocaleString()}원)${profitText}\n`;
+                    markdown += `- **${typeIcon}**: ${t.name || t.ticker} ${t.quantity}주 (@ ${formatPrice(t.price)})${profitText}\n`;
                 });
             } else {
                 markdown += `- 오늘의 매매 내역이 없습니다.\n`;
