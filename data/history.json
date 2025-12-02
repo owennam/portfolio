@@ -16,7 +16,10 @@
   },
   {
     "date": "2025-12-02",
-    "totalValue": 1552327070.71256,
-    "investedAmount": 1523817773.6722
+    "totalValue": 1555349223.416716,
+    "investedAmount": 1522878745.2026,
+    "netWorth": 3201927374.416716,
+    "totalAssets": 4101459590.416716,
+    "liabilities": 899532216
   }
 ]

@@ -10,7 +10,6 @@ export default function TradeForm({ onTradeAdded }) {
         price: '',
         quantity: '',
         fee: '',
-        strategy: '',
         reason: '',
         exchangeRate: 1400,
         account: 'General'
@@ -48,7 +47,7 @@ export default function TradeForm({ onTradeAdded }) {
                 const newTrade = await res.json();
                 onTradeAdded(newTrade);
                 // Reset form (keep date/type/account/exchangeRate)
-                setFormData(prev => ({ ...prev, ticker: '', price: '', quantity: '', fee: '', strategy: '', reason: '' }));
+                setFormData(prev => ({ ...prev, ticker: '', price: '', quantity: '', fee: '', reason: '' }));
                 setStockName('');
             }
         } catch (error) {
@@ -185,10 +184,6 @@ export default function TradeForm({ onTradeAdded }) {
                 <div style={{ flex: '0 0 100px' }}>
                     <label className="text-sm text-muted">수수료</label>
                     <input type="number" name="fee" value={formData.fee} onChange={handleChange} placeholder="0" className="input" step="any" style={{ width: '100%' }} />
-                </div>
-                <div style={{ flex: '0 0 120px' }}>
-                    <label className="text-sm text-muted">전략/태그</label>
-                    <input type="text" name="strategy" value={formData.strategy} onChange={handleChange} placeholder="예: 물타기, 배당" className="input" style={{ width: '100%' }} />
                 </div>
                 <div style={{ flex: '1 1 100%' }}>
                     <label className="text-sm text-muted">매매 사유 / 메모</label>

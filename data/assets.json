@@ -1,0 +1,82 @@
+[
+  {
+    "id": "7c240aa3-1e4d-4233-bd8d-18193a13e833",
+    "createdAt": "2025-12-02T12:44:09.610Z",
+    "category": "Real Estate",
+    "name": "서초트라팰리스",
+    "value": "2250000000",
+    "memo": ""
+  },
+  {
+    "id": "3de942ad-88e7-493a-9883-238d5a44123d",
+    "createdAt": "2025-12-02T12:46:23.149Z",
+    "category": "Cash",
+    "name": "카카오뱅크",
+    "value": "3264521",
+    "memo": ""
+  },
+  {
+    "id": "c79706af-9140-4ff2-aea5-69cbce339830",
+    "createdAt": "2025-12-02T12:46:45.550Z",
+    "category": "Cash",
+    "name": "하나은행",
+    "value": "106140",
+    "memo": ""
+  },
+  {
+    "id": "a7934f16-2695-40b0-8d0f-391e840790f9",
+    "createdAt": "2025-12-02T12:47:17.601Z",
+    "category": "Real Estate",
+    "name": "케이뱅크",
+    "value": "10860874",
+    "memo": ""
+  },
+  {
+    "id": "e85e3a63-f8ac-4c65-9362-b7cc693e3cb1",
+    "createdAt": "2025-12-02T12:47:43.677Z",
+    "category": "Insurance",
+    "name": "미래에셋",
+    "value": "32651120",
+    "memo": ""
+  },
+  {
+    "id": "6fba2d0c-eddb-4c50-b29d-9e52f21522d2",
+    "createdAt": "2025-12-02T12:48:10.153Z",
+    "category": "Other",
+    "name": "삼성증권 예수금",
+    "value": "36722526",
+    "memo": ""
+  },
+  {
+    "id": "6be3a062-43c3-46a7-b6d1-471a6ee1f593",
+    "createdAt": "2025-12-02T12:48:37.895Z",
+    "category": "Other",
+    "name": "업비트 예수금",
+    "value": "3595342",
+    "memo": ""
+  },
+  {
+    "id": "02c483c2-7fcb-4ad9-b149-020230ce8d0d",
+    "createdAt": "2025-12-02T12:48:55.894Z",
+    "category": "Other",
+    "name": "빗썸 예수",
+    "value": "4053170",
+    "memo": ""
+  },
+  {
+    "id": "b62d52ea-143c-4acf-ad9d-6b32a5e74868",
+    "createdAt": "2025-12-02T12:50:05.953Z",
+    "category": "Other",
+    "name": "바이낸스 예수금",
+    "value": "124856674",
+    "memo": ""
+  },
+  {
+    "id": "c3705935-7a4d-48c2-b020-963e1c9a996f",
+    "createdAt": "2025-12-02T12:54:29.781Z",
+    "category": "Real Estate",
+    "name": "대구 집",
+    "value": "80000000",
+    "memo": ""
+  }
+]

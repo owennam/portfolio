@@ -34,7 +34,7 @@ export async function GET() {
 
 export async function POST(request) {
     try {
-        const { date, totalValue, investedAmount } = await request.json();
+        const { date, totalValue, investedAmount, netWorth, totalAssets, liabilities } = await request.json();
 
         if (!date || totalValue === undefined) {
             return Response.json({ error: 'Missing required fields' }, { status: 400 });
@@ -45,12 +45,21 @@ export async function POST(request) {
         // Check if entry for this date already exists
         const existingIndex = history.findIndex(h => h.date === date);
 
+        const newEntry = {
+            date,
+            totalValue,
+            investedAmount,
+            netWorth: netWorth || 0,
+            totalAssets: totalAssets || 0,
+            liabilities: liabilities || 0
+        };
+
         if (existingIndex >= 0) {
             // Update existing entry
-            history[existingIndex] = { ...history[existingIndex], totalValue, investedAmount };
+            history[existingIndex] = { ...history[existingIndex], ...newEntry };
         } else {
             // Add new entry
-            history.push({ date, totalValue, investedAmount });
+            history.push(newEntry);
         }
 
         // Sort by date

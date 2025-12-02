@@ -62,6 +62,38 @@ export default function SummaryCards({ stats }) {
                     })}
                 </div>
             )}
+
+            {/* Domestic Account Breakdown */}
+            {stats.byAccount && (
+                <div style={{ marginTop: '1rem' }}>
+                    <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>🇰🇷 국내 계좌별 현황</h4>
+                    <div className="grid-3">
+                        {Object.entries(stats.byAccount).map(([account, data]) => {
+                            if (data.value === 0) return null;
+                            const accRoi = data.invested > 0 ? ((data.value - data.invested) / data.invested) * 100 : 0;
+
+                            let label = account;
+                            if (account === 'General') label = '개별 종목 (일반)';
+                            if (account === 'Pension') label = '연금저축';
+                            if (account === 'IRP') label = 'IRP';
+
+                            return (
+                                <div key={account} className="card" style={{ padding: '1rem', backgroundColor: 'var(--background-secondary)' }}>
+                                    <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                                        {label}
+                                    </h4>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                        <span style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>{formatCurrency(data.value)}</span>
+                                        <span className={accRoi >= 0 ? 'text-success' : 'text-danger'} style={{ fontSize: '0.85rem' }}>
+                                            {accRoi > 0 ? '+' : ''}{accRoi.toFixed(2)}%
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

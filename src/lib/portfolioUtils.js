@@ -42,11 +42,17 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
     let totalValue = 0;
     const assets = [];
 
-    // Group stats by asset class
+    // Group stats by asset class and account (for Domestic)
     const byAssetClass = {
         'Domestic Stock': { invested: 0, value: 0 },
         'US Stock': { invested: 0, value: 0 },
         'Crypto': { invested: 0, value: 0 }
+    };
+
+    const byAccount = {
+        'General': { invested: 0, value: 0 },
+        'Pension': { invested: 0, value: 0 },
+        'IRP': { invested: 0, value: 0 }
     };
 
     Object.values(holdings).forEach(holding => {
@@ -73,6 +79,14 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
             byAssetClass[holding.assetClass].value += currentValue;
         }
 
+        // Aggregate by Account (Only for Domestic Stock for now, or generally if needed)
+        if (holding.assetClass === 'Domestic Stock') {
+            const accountKey = holding.account || 'General';
+            if (!byAccount[accountKey]) byAccount[accountKey] = { invested: 0, value: 0 };
+            byAccount[accountKey].invested += investedValue;
+            byAccount[accountKey].value += currentValue;
+        }
+
         assets.push({
             ...holding,
             currentPrice,
@@ -90,6 +104,7 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
         netProfit: totalValue - totalInvested,
         roi: totalInvested > 0 ? ((totalValue - totalInvested) / totalInvested) * 100 : 0,
         assets,
-        byAssetClass // Return grouped stats
+        byAssetClass, // Return grouped stats
+        byAccount // Return account stats
     };
 }

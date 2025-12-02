@@ -1,0 +1,34 @@
+[
+  {
+    "id": "2eb2f736-c672-4f9e-ac8e-c0aba0d27a67",
+    "createdAt": "2025-12-02T12:51:05.943Z",
+    "name": "주택담보대출",
+    "amount": "670833340",
+    "interestRate": "2.99",
+    "maturityDate": "2064-03-06"
+  },
+  {
+    "id": "f3b1631e-a335-4f92-99c9-d7c7a2933ac3",
+    "createdAt": "2025-12-02T12:51:36.602Z",
+    "name": "닥터론",
+    "amount": "209412365",
+    "interestRate": "4.08",
+    "maturityDate": "2032-08-18"
+  },
+  {
+    "id": "127a5bd3-9d3c-4f96-8cdf-e8f407a59343",
+    "createdAt": "2025-12-02T12:51:58.299Z",
+    "name": "보험담보대출",
+    "amount": "12670000",
+    "interestRate": "4.0",
+    "maturityDate": ""
+  },
+  {
+    "id": "d794e101-b662-4388-9317-6f6940dcfecc",
+    "createdAt": "2025-12-02T12:53:35.231Z",
+    "name": "마이너스통장",
+    "amount": "6616511",
+    "interestRate": "5.77",
+    "maturityDate": "2026-06-25"
+  }
+]

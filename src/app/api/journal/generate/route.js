@@ -113,7 +113,42 @@ export async function POST(request) {
             if (todayTrades.length > 0) {
                 todayTrades.forEach(t => {
                     const typeIcon = t.type.toLowerCase() === 'buy' ? '🔴 매수' : '🔵 매도';
-                    markdown += `- **${typeIcon}**: ${t.name || t.ticker} ${t.quantity}주 (@ ${Number(t.price).toLocaleString()}원)\n`;
+                    let profitText = '';
+
+                    if (t.type === 'Sell') {
+                        // Calculate Realized Profit
+                        const relevantTrades = trades
+                            .filter(h => h.ticker === t.ticker)
+                            .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                        let avgPrice = 0;
+                        let holdingQty = 0;
+                        let found = false;
+
+                        for (const trade of relevantTrades) {
+                            const qty = parseFloat(trade.quantity);
+                            const price = parseFloat(trade.price);
+
+                            if (trade.id === t.id) {
+                                const profit = (price - avgPrice) * qty;
+                                const roi = avgPrice > 0 ? (profit / (avgPrice * qty)) * 100 : 0;
+                                const sign = profit > 0 ? '+' : '';
+                                profitText = ` (${sign}${Math.round(profit).toLocaleString()}원, ${roi.toFixed(2)}%)`;
+                                found = true;
+                                break;
+                            }
+
+                            if (trade.type === 'Buy') {
+                                const totalCost = (avgPrice * holdingQty) + (price * qty);
+                                holdingQty += qty;
+                                avgPrice = totalCost / holdingQty;
+                            } else if (trade.type === 'Sell') {
+                                holdingQty -= qty;
+                            }
+                        }
+                    }
+
+                    markdown += `- **${typeIcon}**: ${t.name || t.ticker} ${t.quantity}주 (@ ${Number(t.price).toLocaleString()}원)${profitText}\n`;
                 });
             } else {
                 markdown += `- 오늘의 매매 내역이 없습니다.\n`;
