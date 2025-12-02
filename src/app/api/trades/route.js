@@ -14,6 +14,8 @@ export async function GET() {
   }
 }
 
+import { appendTradeToSheet } from '@/lib/googleSheets';
+
 export async function POST(request) {
   try {
     const trade = await request.json();
@@ -29,6 +31,9 @@ export async function POST(request) {
     trades.push(newTrade);
 
     await fs.writeFile(dataFilePath, JSON.stringify(trades, null, 2));
+
+    // Append to Google Sheet (fire and forget, don't block response)
+    appendTradeToSheet(newTrade).catch(err => console.error('Sheet upload failed:', err));
 
     return Response.json(newTrade);
   } catch (error) {

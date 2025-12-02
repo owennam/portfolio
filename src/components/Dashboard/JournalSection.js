@@ -5,12 +5,17 @@ import ReactMarkdown from 'react-markdown';
 export default function JournalSection({ stats, trades, history }) {
     const [journal, setJournal] = useState('');
     const [loading, setLoading] = useState(false);
-    const [mode, setMode] = useState('preview'); // 'preview' or 'edit'
+    const [mode, setMode] = useState('preview');
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
 
     const handleGenerate = async () => {
         setLoading(true);
         try {
-            // Get top 3 holdings by value
             const sortedTrades = [...trades].sort((a, b) => (b.price * b.quantity) - (a.price * a.quantity));
             const topHoldings = sortedTrades.slice(0, 3).map(t => ({ ticker: t.ticker, name: t.name }));
 
@@ -24,8 +29,8 @@ export default function JournalSection({ stats, trades, history }) {
                         netProfit: stats.netProfit,
                         roi: stats.roi
                     },
-                    trades: trades, // Pass all trades, backend filters for today
-                    history: history // Pass history for comparison
+                    trades: trades,
+                    history: history
                 })
             });
             const data = await res.json();
@@ -35,18 +40,23 @@ export default function JournalSection({ stats, trades, history }) {
             }
         } catch (error) {
             console.error('Failed to generate journal', error);
-            alert('일지 생성 실패');
+            showToast('일지 생성 실패', 'error');
         } finally {
             setLoading(false);
         }
     };
 
     const handleSave = async () => {
-        if (!journal) return;
-        if (!confirm('일지를 저장하시겠습니까?')) return;
+        console.log('handleSave called');
+        if (!journal) {
+            showToast('저장할 일지가 없습니다', 'error');
+            return;
+        }
 
         try {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toLocaleDateString('en-CA');
+            console.log('Saving journal for date:', today);
+
             const res = await fetch('/api/journal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -56,24 +66,48 @@ export default function JournalSection({ stats, trades, history }) {
                 })
             });
 
+            console.log('Response status:', res.status);
+
             if (res.ok) {
-                alert('저장되었습니다!');
+                console.log('Save successful');
+                showToast('✅ 투자 일지가 저장되었습니다!', 'success');
             } else {
-                alert('저장 실패');
+                const errorText = await res.text();
+                console.error('Save failed:', res.status, errorText);
+                showToast('저장 실패', 'error');
             }
         } catch (error) {
             console.error('Failed to save journal', error);
-            alert('오류 발생');
+            showToast('오류 발생', 'error');
         }
     };
 
     const handleCopy = () => {
         navigator.clipboard.writeText(journal);
-        alert('클립보드에 복사되었습니다!');
+        showToast('클립보드에 복사되었습니다!', 'success');
     };
 
     return (
-        <div className="card" style={{ padding: '1.5rem' }}>
+        <div className="card" style={{ padding: '1.5rem', position: 'relative' }}>
+            {toast && (
+                <div style={{
+                    position: 'fixed',
+                    top: '20px',
+                    right: '20px',
+                    padding: '1rem 1.5rem',
+                    background: toast.type === 'success' ? '#10b981' : '#ef4444',
+                    color: 'white',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    zIndex: 1000,
+                    animation: 'slideIn 0.3s ease-out',
+                    fontSize: '1rem',
+                    fontWeight: '500'
+                }}>
+                    {toast.message}
+                </div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h2 style={{ margin: 0 }}>🤖 AI 투자 일지</h2>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -128,6 +162,19 @@ export default function JournalSection({ stats, trades, history }) {
                     <p>버튼을 눌러 오늘의 시장 상황과 내 포트폴리오를 분석해보세요.</p>
                 </div>
             )}
+
+            <style jsx>{`
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `}</style>
         </div>
     );
 }

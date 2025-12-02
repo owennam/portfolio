@@ -23,7 +23,40 @@ export async function POST(request) {
             })
         );
 
-        // 2. Generate Markdown Draft
+        // 2. Fetch Fear & Greed Index
+        const getStockFNG = async () => {
+            try {
+                const res = await fetch('https://production.dataviz.cnn.io/index/fearandgreed/graphdata', {
+                    headers: { 'User-Agent': 'Mozilla/5.0' }
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return {
+                    score: Math.round(data.fear_and_greed.score),
+                    rating: data.fear_and_greed.rating
+                };
+            } catch (e) {
+                return null;
+            }
+        };
+
+        const getCryptoFNG = async () => {
+            try {
+                const res = await fetch('https://api.alternative.me/fng/');
+                if (!res.ok) return null;
+                const data = await res.json();
+                return {
+                    score: data.data[0].value,
+                    rating: data.data[0].value_classification
+                };
+            } catch (e) {
+                return null;
+            }
+        };
+
+        const [stockFNG, cryptoFNG] = await Promise.all([getStockFNG(), getCryptoFNG()]);
+
+        // 3. Generate Markdown Draft
         const today = new Date();
         const todayStr = today.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
         const todayISO = today.toISOString().split('T')[0];
@@ -55,13 +88,31 @@ export async function POST(request) {
             markdown += `\n`;
         }
 
+        // Add Market Sentiment
+        if (stockFNG || cryptoFNG) {
+            markdown += `## 🧠 시장 심리 (공포/탐욕 지수)\n`;
+            if (stockFNG) {
+                let icon = '😐';
+                if (stockFNG.rating.includes('Fear')) icon = '😨';
+                if (stockFNG.rating.includes('Greed')) icon = '🤑';
+                markdown += `- **주식 시장**: ${stockFNG.score} (${stockFNG.rating} ${icon})\n`;
+            }
+            if (cryptoFNG) {
+                let icon = '😐';
+                if (cryptoFNG.rating.includes('Fear')) icon = '😨';
+                if (cryptoFNG.rating.includes('Greed')) icon = '🤑';
+                markdown += `- **암호화폐**: ${cryptoFNG.score} (${cryptoFNG.rating} ${icon})\n`;
+            }
+            markdown += `\n`;
+        }
+
         // Add Trade Log
         markdown += `## 📝 오늘의 매매 기록\n`;
         if (trades && trades.length > 0) {
             const todayTrades = trades.filter(t => t.date === todayISO);
             if (todayTrades.length > 0) {
                 todayTrades.forEach(t => {
-                    const typeIcon = t.type === 'buy' ? '🔴 매수' : '🔵 매도';
+                    const typeIcon = t.type.toLowerCase() === 'buy' ? '🔴 매수' : '🔵 매도';
                     markdown += `- **${typeIcon}**: ${t.name || t.ticker} ${t.quantity}주 (@ ${Number(t.price).toLocaleString()}원)\n`;
                 });
             } else {

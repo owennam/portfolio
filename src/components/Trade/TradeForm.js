@@ -9,11 +9,32 @@ export default function TradeForm({ onTradeAdded }) {
         ticker: '',
         price: '',
         quantity: '',
+        fee: '',
+        strategy: '',
         reason: '',
+        exchangeRate: 1400,
         account: 'General'
     });
     const [stockName, setStockName] = useState('');
     const [fetchingName, setFetchingName] = useState(false);
+    const [currentRate, setCurrentRate] = useState(1400); // Default fallback
+
+    // Fetch Exchange Rate on Mount
+    useState(() => {
+        const fetchRate = async () => {
+            try {
+                const res = await fetch('/api/prices?tickers=KRW=X');
+                const data = await res.json();
+                if (data && data[0] && data[0].price) {
+                    setCurrentRate(data[0].price);
+                    setFormData(prev => ({ ...prev, exchangeRate: data[0].price }));
+                }
+            } catch (error) {
+                console.error('Failed to fetch exchange rate', error);
+            }
+        };
+        fetchRate();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,8 +47,8 @@ export default function TradeForm({ onTradeAdded }) {
             if (res.ok) {
                 const newTrade = await res.json();
                 onTradeAdded(newTrade);
-                // Reset form (keep date/type/account for convenience)
-                setFormData(prev => ({ ...prev, ticker: '', price: '', quantity: '', reason: '' }));
+                // Reset form (keep date/type/account/exchangeRate)
+                setFormData(prev => ({ ...prev, ticker: '', price: '', quantity: '', fee: '', strategy: '', reason: '' }));
                 setStockName('');
             }
         } catch (error) {
@@ -36,7 +57,47 @@ export default function TradeForm({ onTradeAdded }) {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => {
+            const updated = { ...prev, [name]: value };
+
+            // Auto-calculate fee if price/quantity/assetClass/type/account changes
+            if (['price', 'quantity', 'assetClass', 'type', 'account'].includes(name)) {
+                const price = parseFloat(updated.price) || 0;
+                const qty = parseFloat(updated.quantity) || 0;
+                const amount = price * qty;
+
+                if (amount > 0) {
+                    let rate = 0;
+
+                    if (updated.assetClass === 'Crypto') {
+                        // Binance: 0.1%
+                        rate = 0.001;
+                    } else if (updated.assetClass === 'US Stock') {
+                        // Samsung Securities (US): 0.07% (Event rate assumption)
+                        rate = 0.0007;
+                    } else if (updated.assetClass === 'Domestic Stock') {
+                        if (updated.account === 'General') {
+                            // Samsung Securities (Domestic)
+                            // Fee: ~0.0036396%, Tax (Sell only): 0.18%
+                            const baseFee = 0.000036396;
+                            const tax = updated.type === 'Sell' ? 0.0018 : 0;
+                            rate = baseFee + tax;
+                        } else {
+                            // Pension/IRP (Mirae Asset): ~0.0036396% (ETF)
+                            rate = 0.000036396;
+                        }
+                    }
+
+                    if (['US Stock', 'Crypto'].includes(updated.assetClass)) {
+                        updated.fee = (amount * rate).toFixed(2);
+                    } else {
+                        updated.fee = Math.floor(amount * rate);
+                    }
+                }
+            }
+            return updated;
+        });
     };
 
     const handleTickerBlur = async () => {
@@ -120,6 +181,14 @@ export default function TradeForm({ onTradeAdded }) {
                 <div style={{ flex: '0 0 100px' }}>
                     <label className="text-sm text-muted">수량</label>
                     <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} placeholder="수량" className="input" step="any" required style={{ width: '100%' }} />
+                </div>
+                <div style={{ flex: '0 0 100px' }}>
+                    <label className="text-sm text-muted">수수료</label>
+                    <input type="number" name="fee" value={formData.fee} onChange={handleChange} placeholder="0" className="input" step="any" style={{ width: '100%' }} />
+                </div>
+                <div style={{ flex: '0 0 120px' }}>
+                    <label className="text-sm text-muted">전략/태그</label>
+                    <input type="text" name="strategy" value={formData.strategy} onChange={handleChange} placeholder="예: 물타기, 배당" className="input" style={{ width: '100%' }} />
                 </div>
                 <div style={{ flex: '1 1 100%' }}>
                     <label className="text-sm text-muted">매매 사유 / 메모</label>

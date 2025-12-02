@@ -82,7 +82,7 @@ export default function Home() {
 
             // Auto-save history if totalValue > 0
             if (computedStats.totalValue > 0) {
-                const today = new Date().toISOString().split('T')[0];
+                const today = new Date().toLocaleDateString('en-CA');
 
                 fetch('/api/history', {
                     method: 'POST',
