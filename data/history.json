@@ -21,5 +21,13 @@
     "netWorth": 3201927374.416716,
     "totalAssets": 4101459590.416716,
     "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-03",
+    "totalValue": 1632445698.677744,
+    "investedAmount": 1524720685.6622,
+    "netWorth": 3279023849.677744,
+    "totalAssets": 4178556065.677744,
+    "liabilities": 899532216
   }
 ]
