@@ -59,7 +59,7 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
     Object.values(holdings).forEach(holding => {
         if (holding.quantity <= 0.000001) return; // Ignore sold out positions
 
-        const currentPriceObj = currentPrices.find(p => p.ticker === holding.ticker);
+        const currentPriceObj = currentPrices.find(p => p.ticker.toUpperCase() === holding.ticker);
         const currentPrice = currentPriceObj ? currentPriceObj.price : holding.avgPrice;
 
         let currentValue = holding.quantity * currentPrice;

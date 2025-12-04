@@ -132,6 +132,87 @@ export default function StockAnalysisPage() {
                 </div>
             </header>
 
+            {/* AI Valuation Section */}
+            <div className="card" style={{ marginBottom: '2rem', border: '1px solid var(--primary)', background: 'rgba(59, 130, 246, 0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        🤖 AI Valuation Engine
+                        {analysis.aiAnalysis && <span style={{ fontSize: '0.8rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>Updated: {analysis.aiAnalysis.lastUpdated}</span>}
+                    </h3>
+                    <button
+                        onClick={async () => {
+                            if (confirm('Run AI Valuation? This will fetch real-time data.')) {
+                                try {
+                                    const res = await fetch('/api/valuation', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ ticker })
+                                    });
+                                    if (res.ok) {
+                                        const data = await res.json();
+                                        setAnalysis(prev => ({ ...prev, aiAnalysis: data.data }));
+                                        alert('AI Valuation Complete!');
+                                    } else {
+                                        alert('Valuation Failed');
+                                    }
+                                } catch (e) {
+                                    console.error(e);
+                                    alert('Error running valuation');
+                                }
+                            }
+                        }}
+                        className="btn btn-sm"
+                        style={{ fontSize: '0.8rem', padding: '0.25rem 0.75rem', background: 'var(--surface)', border: '1px solid var(--border)' }}
+                    >
+                        🔄 Run Analysis
+                    </button>
+                </div>
+
+                {analysis.aiAnalysis ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
+                        {/* Main Result */}
+                        <div style={{ textAlign: 'center', padding: '1rem', background: 'var(--surface)', borderRadius: '8px' }}>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>AI Fair Value</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--primary)' }}>
+                                ${analysis.aiAnalysis.aiFairValue?.toFixed(2) || 'N/A'}
+                            </div>
+                            {price && analysis.aiAnalysis.aiFairValue && (
+                                <div style={{
+                                    fontWeight: 'bold',
+                                    color: (analysis.aiAnalysis.aiFairValue - price) > 0 ? 'var(--success)' : 'var(--danger)'
+                                }}>
+                                    Upside: {((analysis.aiAnalysis.aiFairValue - price) / price * 100).toFixed(1)}%
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Breakdown */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="stat-box">
+                                <div className="label">Graham Number</div>
+                                <div className="value">${analysis.aiAnalysis.details?.grahamNumber?.toFixed(2) || 'N/A'}</div>
+                            </div>
+                            <div className="stat-box">
+                                <div className="label">Peter Lynch Value</div>
+                                <div className="value">${analysis.aiAnalysis.details?.peterLynchValue?.toFixed(2) || 'N/A'}</div>
+                            </div>
+                            <div className="stat-box">
+                                <div className="label">Simplified DCF</div>
+                                <div className="value">${analysis.aiAnalysis.details?.dcfValue?.toFixed(2) || 'N/A'}</div>
+                            </div>
+                            <div className="stat-box">
+                                <div className="label">Analyst Target</div>
+                                <div className="value">${analysis.aiAnalysis.details?.consensusTarget?.toFixed(2) || 'N/A'}</div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                        No AI Analysis data available. Click "Run Analysis" to generate.
+                    </div>
+                )}
+            </div>
+
             <div className="grid-2" style={{ gap: '2rem' }}>
                 {/* Intrinsic Value */}
                 <div className="card">

@@ -74,6 +74,7 @@ export default function HistoryChart({ history }) {
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
                 tension: 0.3,
+                pointRadius: 4,
                 fill: true
             },
             {
@@ -81,8 +82,8 @@ export default function HistoryChart({ history }) {
                 data: history.map(h => h.investedAmount || null),
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderDash: [5, 5],
                 tension: 0.3,
+                pointRadius: 4,
                 hidden: false
             }
         ],

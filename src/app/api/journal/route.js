@@ -1,65 +1,57 @@
-import { promises as fs } from 'fs';
+import { NextResponse } from 'next/server';
+import fs from 'fs';
 import path from 'path';
+import { fetchPortfolioNews } from '@/lib/journal/newsFetcher';
+import { analyzeNews } from '@/lib/journal/llmAnalyzer';
 
-const dataDir = path.join(process.cwd(), 'data');
-const journalsFile = path.join(dataDir, 'journals.json');
-
-async function ensureDataDir() {
-    try {
-        await fs.access(dataDir);
-    } catch {
-        await fs.mkdir(dataDir, { recursive: true });
-    }
-}
-
-async function getJournals() {
-    await ensureDataDir();
-    try {
-        const data = await fs.readFile(journalsFile, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
-
-async function saveJournals(journals) {
-    await ensureDataDir();
-    await fs.writeFile(journalsFile, JSON.stringify(journals, null, 2));
-}
-
-export async function GET() {
-    const journals = await getJournals();
-    // Sort by date descending
-    journals.sort((a, b) => new Date(b.date) - new Date(a.date));
-    return Response.json(journals);
-}
+const TRADES_FILE = path.join(process.cwd(), 'data', 'trades.json');
 
 export async function POST(request) {
     try {
-        const { date, content } = await request.json();
+        console.log('Journal API called');
 
-        if (!date || !content) {
-            return Response.json({ error: 'Missing required fields' }, { status: 400 });
+        // 1. Get Tickers from Portfolio
+        console.log('Reading trades file:', TRADES_FILE);
+        if (!fs.existsSync(TRADES_FILE)) {
+            console.error('Trades file not found');
+            return NextResponse.json({ news: [], analysis: null });
         }
 
-        const journals = await getJournals();
+        const fileData = fs.readFileSync(TRADES_FILE, 'utf8');
+        const trades = JSON.parse(fileData);
 
-        // Check if entry for this date already exists
-        const existingIndex = journals.findIndex(j => j.date === date);
+        // Extract unique tickers
+        const tickers = [...new Set(trades.map(t => t.ticker))];
+        console.log('Tickers found:', tickers);
 
-        if (existingIndex >= 0) {
-            // Update existing entry
-            journals[existingIndex] = { ...journals[existingIndex], content, updatedAt: new Date().toISOString() };
-        } else {
-            // Add new entry
-            journals.push({ date, content, createdAt: new Date().toISOString() });
+        if (tickers.length === 0) {
+            return NextResponse.json({ news: [], analysis: null });
         }
 
-        await saveJournals(journals);
+        // 2. Fetch News
+        console.log('Fetching news...');
+        const news = await fetchPortfolioNews(tickers);
+        console.log('News fetched count:', news ? news.length : 'null');
 
-        return Response.json({ success: true });
+        // 3. Analyze (Optional: only if requested)
+        const body = await request.json();
+        const analyze = body.analyze;
+        let analysis = null;
+
+        if (analyze) {
+            console.log('Analyzing news...');
+            analysis = await analyzeNews(news, { tickerCount: tickers.length });
+            console.log('Analysis complete');
+        }
+
+        return NextResponse.json({
+            success: true,
+            news,
+            analysis
+        });
+
     } catch (error) {
-        console.error('Failed to save journal', error);
-        return Response.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Journal API Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
     }
 }

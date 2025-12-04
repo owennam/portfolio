@@ -255,11 +255,14 @@ export default function Home() {
                     <Link href="/networth" className="btn btn-outline" style={{ borderColor: '#3b82f6', color: '#3b82f6' }}>
                         💰 자산/부채 관리
                     </Link>
-                    <Link href="/journal" className="btn btn-outline">
-                        📚 일지 보관함
+                    <Link href="/journal" className="btn btn-outline" style={{ borderColor: '#8b5cf6', color: '#8b5cf6' }}>
+                        📰 AI Journal
                     </Link>
                     <Link href="/rebalancing" className="btn btn-outline">
                         ⚖️ 리밸런싱
+                    </Link>
+                    <Link href="/simulator" className="btn btn-outline" style={{ borderColor: '#f87171', color: '#f87171' }}>
+                        🌪️ Risk Sim
                     </Link>
                     <div className="text-sm text-muted">
                         {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
