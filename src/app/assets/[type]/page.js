@@ -127,7 +127,7 @@ function HoldingsTable({ holdings }) {
                         const currency = isForeign ? 'USD' : 'KRW';
 
                         return (
-                            <tr key={holding.ticker} style={{ borderBottom: '1px solid var(--border)' }}>
+                            <tr key={`${holding.ticker}-${holding.account}`} style={{ borderBottom: '1px solid var(--border)' }}>
                                 <td style={{ padding: '1rem' }}>
                                     <div style={{ fontWeight: 'bold' }}>{holding.name}</div>
                                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{holding.ticker}</div>

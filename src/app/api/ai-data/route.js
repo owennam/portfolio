@@ -30,6 +30,7 @@ export async function GET() {
                 return {
                     ticker,
                     price: quote.regularMarketPrice,
+                    changePercent: quote.regularMarketChangePercent, // Fetch daily change
                     quoteType: quote.quoteType
                 };
             } catch (e) {
@@ -37,11 +38,21 @@ export async function GET() {
                 if (/^\d{6}$/.test(ticker)) {
                     try {
                         const quote = await yf.quote(ticker + '.KS');
-                        return { ticker, price: quote.regularMarketPrice, quoteType: quote.quoteType };
+                        return {
+                            ticker,
+                            price: quote.regularMarketPrice,
+                            changePercent: quote.regularMarketChangePercent,
+                            quoteType: quote.quoteType
+                        };
                     } catch (e2) {
                         try {
                             const quote = await yf.quote(ticker + '.KQ');
-                            return { ticker, price: quote.regularMarketPrice, quoteType: quote.quoteType };
+                            return {
+                                ticker,
+                                price: quote.regularMarketPrice,
+                                changePercent: quote.regularMarketChangePercent,
+                                quoteType: quote.quoteType
+                            };
                         } catch (e3) { return null; }
                     }
                 }
@@ -71,17 +82,22 @@ export async function GET() {
                 roi: parseFloat(stats.roi.toFixed(2)),
                 exchangeRate: exchangeRate
             },
-            holdings: stats.assets.map(a => ({
-                ticker: a.ticker,
-                name: a.name,
-                assetClass: a.assetClass,
-                quantity: a.quantity,
-                avgPrice: Math.round(a.avgPrice),
-                currentPrice: Math.round(a.currentPrice),
-                totalValue: Math.round(a.currentValue),
-                profit: Math.round(a.profit),
-                roi: parseFloat(a.roi.toFixed(2))
-            })).sort((a, b) => b.totalValue - a.totalValue),
+            holdings: stats.assets.map(a => {
+                // Find price object to get daily change
+                const priceObj = prices.find(p => p.ticker === a.ticker);
+                return {
+                    ticker: a.ticker,
+                    name: a.name,
+                    assetClass: a.assetClass,
+                    quantity: a.quantity,
+                    avgPrice: Math.round(a.avgPrice),
+                    currentPrice: Math.round(a.currentPrice),
+                    dailyChange: priceObj ? parseFloat(priceObj.changePercent?.toFixed(2)) : 0, // Add dailyChange
+                    totalValue: Math.round(a.currentValue),
+                    profit: Math.round(a.profit),
+                    roi: parseFloat(a.roi.toFixed(2))
+                };
+            }).sort((a, b) => b.totalValue - a.totalValue),
             recentTrades: trades.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20),
             latestJournal: journals.sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null
         };

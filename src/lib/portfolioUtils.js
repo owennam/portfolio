@@ -3,7 +3,8 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
     const holdings = {};
 
     trades.forEach(trade => {
-        const { ticker, type, price, quantity, assetClass, account = 'General' } = trade;
+        const { type, price, quantity, assetClass, account = 'General' } = trade;
+        const ticker = trade.ticker.toUpperCase();
         const qty = parseFloat(quantity);
         const cost = parseFloat(price);
         const key = `${ticker}-${account}`;

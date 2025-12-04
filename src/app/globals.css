@@ -141,6 +141,12 @@ a {
   gap: 1.5rem;
 }
 
+.grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+}
+
 @media (max-width: 768px) {
 
   .grid-2,

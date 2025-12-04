@@ -26,5 +26,8 @@
   "MSTR-General": 5,
   "IONQ-General": 0,
   "NET-General": 0,
-  "BE-General": 0
+  "BE-General": 0,
+  "Category-Crypto": 50,
+  "Category-US Stock": 30,
+  "Category-Domestic Stock": 20
 }

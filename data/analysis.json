@@ -1,0 +1,1671 @@
+{
+  "PLTR": {
+    "ticker": "PLTR",
+    "name": "Palantir Technologies Inc.",
+    "assetClass": "US Stock",
+    "currentPrice": 175.56,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 120,
+      "range": {
+        "low": 100,
+        "high": 140
+      },
+      "method": "DCF (60%) + P/E (20%) + PEG (20%) + Premium",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 18.5,
+      "rating": "Wide",
+      "trend": "Strengthening",
+      "breakdown": {
+        "networkEffect": 5,
+        "switchingCosts": 5,
+        "intangibleAssets": 5,
+        "costAdvantage": 4,
+        "efficientScale": 4
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 19.8,
+        "grade": "A"
+      },
+      "roic": {
+        "current": 60.1,
+        "grade": "S"
+      },
+      "debtEquity": {
+        "current": 0,
+        "grade": "A+"
+      },
+      "overallGrade": "S",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "AIP가 성장을 견인할 것이다 (US Commercial +121%)",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "흑자 전환 후 이익률 개선 (Rule of 40 달성)",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "정부 매출 의존도 축소",
+          "valid": true,
+          "confidence": 85
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "펀더멘털(ROIC 60%) 강력하나 고평가 상태. 모멘텀 유효.",
+      "targetPrice": 140,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Partial Sell (10-20%)",
+        "condition": "Price > "
+      },
+      {
+        "action": "Buy Dip",
+        "condition": "Price < "
+      }
+    ],
+    "priceHistory": []
+  },
+  "GLD": {
+    "ticker": "GLD",
+    "name": "StreetTRACKS Gold Shares",
+    "intrinsicValue": {
+      "midpoint": null,
+      "range": {
+        "low": null,
+        "high": null
+      },
+      "method": "Pending",
+      "lastUpdated": null,
+      "history": []
+    },
+    "moat": {
+      "score": null,
+      "rating": "Unrated",
+      "breakdown": {
+        "networkEffect": 0,
+        "switchingCosts": 0,
+        "intangibleAssets": 0,
+        "costAdvantage": 0,
+        "efficientScale": 0
+      },
+      "lastUpdated": null
+    },
+    "capitalAllocation": {
+      "overallGrade": "Unrated",
+      "roe": {
+        "current": null,
+        "grade": "-"
+      },
+      "roic": {
+        "current": null,
+        "grade": "-"
+      },
+      "debtEquity": {
+        "current": null,
+        "grade": "-"
+      },
+      "lastUpdated": null
+    },
+    "investmentThesis": {
+      "hypotheses": [],
+      "lastUpdated": null
+    },
+    "sellCriteria": [],
+    "recommendation": {
+      "action": "ANALYZE",
+      "reason": "Initial template created. Analysis required.",
+      "targetPrice": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [],
+    "priceHistory": []
+  },
+  "SLV": {
+    "ticker": "SLV",
+    "name": "iShares Silver Trust",
+    "intrinsicValue": {
+      "midpoint": null,
+      "range": {
+        "low": null,
+        "high": null
+      },
+      "method": "Pending",
+      "lastUpdated": null,
+      "history": []
+    },
+    "moat": {
+      "score": null,
+      "rating": "Unrated",
+      "breakdown": {
+        "networkEffect": 0,
+        "switchingCosts": 0,
+        "intangibleAssets": 0,
+        "costAdvantage": 0,
+        "efficientScale": 0
+      },
+      "lastUpdated": null
+    },
+    "capitalAllocation": {
+      "overallGrade": "Unrated",
+      "roe": {
+        "current": null,
+        "grade": "-"
+      },
+      "roic": {
+        "current": null,
+        "grade": "-"
+      },
+      "debtEquity": {
+        "current": null,
+        "grade": "-"
+      },
+      "lastUpdated": null
+    },
+    "investmentThesis": {
+      "hypotheses": [],
+      "lastUpdated": null
+    },
+    "sellCriteria": [],
+    "recommendation": {
+      "action": "ANALYZE",
+      "reason": "Initial template created. Analysis required.",
+      "targetPrice": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [],
+    "priceHistory": []
+  },
+  "GOOGL": {
+    "ticker": "GOOGL",
+    "name": "Alphabet Inc.",
+    "assetClass": "US Stock",
+    "currentPrice": 320.61,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 395,
+      "range": {
+        "low": 370,
+        "high": 420
+      },
+      "method": "DCF (60%) + P/E (20%) + PEG (20%)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 22,
+      "rating": "Wide",
+      "trend": "maintaining",
+      "breakdown": {
+        "brand": 5,
+        "network": 5,
+        "switchingCost": 3,
+        "scale": 5,
+        "thiel10x": 4
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 33,
+        "grade": "A+"
+      },
+      "roic": {
+        "current": 28,
+        "grade": "A+"
+      },
+      "debtEquity": {
+        "current": 0.05,
+        "grade": "A+"
+      },
+      "overallGrade": "A+",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "AI 통합으로 검색 개선",
+          "valid": true,
+          "confidence": 80
+        },
+        {
+          "hypothesis": "클라우드 고성장",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "YouTube 광고 회복",
+          "valid": true,
+          "confidence": 85
+        }
+      ],
+      "overallStatus": "valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "sellCriteria": [
+      {
+        "condition": "ROE < 15% 3년 연속",
+        "triggered": false
+      },
+      {
+        "condition": "광고 매출 -20%+",
+        "triggered": false
+      },
+      {
+        "condition": "DOJ 독점 해체",
+        "triggered": false
+      }
+    ],
+    "recommendation": {
+      "action": "STRONG BUY",
+      "reason": "안전마진 +23%, Moat 강력, 자본배분 A+, 3/3 가설 유효",
+      "targetPrice": 420,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 18,
+        "triggered": false
+      }
+    },
+    "nextActions": [],
+    "priceHistory": []
+  },
+  "TSLA": {
+    "ticker": "TSLA",
+    "name": "Tesla, Inc.",
+    "assetClass": "US Stock",
+    "currentPrice": 446.89,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 220,
+      "range": {
+        "low": 180,
+        "high": 280
+      },
+      "method": "DCF (60%) + P/E (20%) + PEG (20%)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 14.4,
+      "rating": "Strong",
+      "trend": "Eroding",
+      "breakdown": {
+        "brand": 5,
+        "networkEffect": 4,
+        "switchingCosts": 2,
+        "scale": 5,
+        "technology": 5
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 7,
+        "grade": "C"
+      },
+      "roic": {
+        "current": 6.5,
+        "grade": "C"
+      },
+      "debtEquity": {
+        "current": 0.1,
+        "grade": "A"
+      },
+      "overallGrade": "B-",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "Robotaxi 상용화 (2026-2027)",
+          "valid": true,
+          "confidence": 70
+        },
+        {
+          "hypothesis": "Optimus (휴머노이드) 가치 실현",
+          "valid": true,
+          "confidence": 60
+        },
+        {
+          "hypothesis": "Energy 사업 성장 (Megapack)",
+          "valid": true,
+          "confidence": 80
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "SELL",
+      "reason": "초고평가 (안전마진 -50%), 해자 침식 중",
+      "targetPrice": 220,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": true
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Trim (30-50%)",
+        "condition": "Now"
+      },
+      {
+        "action": "Buy",
+        "condition": "Price < "
+      }
+    ],
+    "priceHistory": []
+  },
+  "BMNR": {
+    "ticker": "BMNR",
+    "name": "BitMine Immersion Technologies",
+    "assetClass": "US Stock",
+    "currentPrice": 33.66,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 30,
+      "range": {
+        "low": 25,
+        "high": 35
+      },
+      "method": "NAV (80%) + Growth (20%)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 15,
+      "rating": "Moderate",
+      "trend": "Stable",
+      "breakdown": {
+        "brand": 2,
+        "scale": 5,
+        "networkEffect": 2,
+        "switchingCosts": 1,
+        "technology": 3
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 0,
+        "grade": "N/A"
+      },
+      "roic": {
+        "current": 0,
+        "grade": "N/A"
+      },
+      "debtEquity": {
+        "current": 0,
+        "grade": "N/A"
+      },
+      "overallGrade": "B+",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "이더리움 강세 (Alt-season)",
+          "valid": true,
+          "confidence": 85
+        },
+        {
+          "hypothesis": "프리미엄 확대 (MSTR 효과)",
+          "valid": true,
+          "confidence": 80
+        },
+        {
+          "hypothesis": "스테이킹 수익 창출",
+          "valid": true,
+          "confidence": 90
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "BUY",
+      "reason": "이더리움 레버리지 (안전마진 -12%)",
+      "targetPrice": 40,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -10,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Buy",
+        "condition": "Premium < 10%"
+      },
+      {
+        "action": "Sell",
+        "condition": "Premium > 50%"
+      }
+    ],
+    "priceHistory": []
+  },
+  "BE": {
+    "ticker": "BE",
+    "name": "Bloom Energy Corporation",
+    "intrinsicValue": {
+      "midpoint": null,
+      "range": {
+        "low": null,
+        "high": null
+      },
+      "method": "Pending",
+      "lastUpdated": null,
+      "history": []
+    },
+    "moat": {
+      "score": null,
+      "rating": "Unrated",
+      "breakdown": {
+        "networkEffect": 0,
+        "switchingCosts": 0,
+        "intangibleAssets": 0,
+        "costAdvantage": 0,
+        "efficientScale": 0
+      },
+      "lastUpdated": null
+    },
+    "capitalAllocation": {
+      "overallGrade": "Unrated",
+      "roe": {
+        "current": null,
+        "grade": "-"
+      },
+      "roic": {
+        "current": null,
+        "grade": "-"
+      },
+      "debtEquity": {
+        "current": null,
+        "grade": "-"
+      },
+      "lastUpdated": null
+    },
+    "investmentThesis": {
+      "hypotheses": [],
+      "lastUpdated": null
+    },
+    "sellCriteria": [],
+    "recommendation": {
+      "action": "ANALYZE",
+      "reason": "Initial template created. Analysis required.",
+      "targetPrice": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [],
+    "priceHistory": []
+  },
+  "NVDA": {
+    "ticker": "NVDA",
+    "name": "NVIDIA Corporation",
+    "assetClass": "US Stock",
+    "currentPrice": 179.92,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 135,
+      "range": {
+        "low": 110,
+        "high": 160
+      },
+      "method": "DCF (60%) + P/E (20%) + PEG (20%)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 19,
+      "rating": "Very Wide",
+      "trend": "Maintaining",
+      "breakdown": {
+        "brand": 5,
+        "networkEffect": 5,
+        "switchingCosts": 4,
+        "scale": 5,
+        "technology": 4
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 107.36,
+        "grade": "A++"
+      },
+      "roic": {
+        "current": 66.87,
+        "grade": "A++"
+      },
+      "debtEquity": {
+        "current": 0.11,
+        "grade": "A+"
+      },
+      "overallGrade": "A+",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "Data Center AI 슈퍼사이클 지속",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "Blackwell 제품 사이클 성공",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "CUDA 생태계 방어",
+          "valid": true,
+          "confidence": 75
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "2.8/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "비즈니스 S+, 밸류에이션 C. 조정 대기.",
+      "targetPrice": 140,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Wait (New Buyers)",
+        "condition": "Price < "
+      },
+      {
+        "action": "Trim (Overweight)",
+        "condition": "Price > "
+      }
+    ],
+    "priceHistory": []
+  },
+  "NET": {
+    "ticker": "NET",
+    "name": "Cloudflare, Inc.",
+    "intrinsicValue": {
+      "midpoint": null,
+      "range": {
+        "low": null,
+        "high": null
+      },
+      "method": "Pending",
+      "lastUpdated": null,
+      "history": []
+    },
+    "moat": {
+      "score": null,
+      "rating": "Unrated",
+      "breakdown": {
+        "networkEffect": 0,
+        "switchingCosts": 0,
+        "intangibleAssets": 0,
+        "costAdvantage": 0,
+        "efficientScale": 0
+      },
+      "lastUpdated": null
+    },
+    "capitalAllocation": {
+      "overallGrade": "Unrated",
+      "roe": {
+        "current": null,
+        "grade": "-"
+      },
+      "roic": {
+        "current": null,
+        "grade": "-"
+      },
+      "debtEquity": {
+        "current": null,
+        "grade": "-"
+      },
+      "lastUpdated": null
+    },
+    "investmentThesis": {
+      "hypotheses": [],
+      "lastUpdated": null
+    },
+    "sellCriteria": [],
+    "recommendation": {
+      "action": "ANALYZE",
+      "reason": "Initial template created. Analysis required.",
+      "targetPrice": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [],
+    "priceHistory": []
+  },
+  "IONQ": {
+    "ticker": "IONQ",
+    "name": "IonQ, Inc.",
+    "intrinsicValue": {
+      "midpoint": null,
+      "range": {
+        "low": null,
+        "high": null
+      },
+      "method": "Pending",
+      "lastUpdated": null,
+      "history": []
+    },
+    "moat": {
+      "score": null,
+      "rating": "Unrated",
+      "breakdown": {
+        "networkEffect": 0,
+        "switchingCosts": 0,
+        "intangibleAssets": 0,
+        "costAdvantage": 0,
+        "efficientScale": 0
+      },
+      "lastUpdated": null
+    },
+    "capitalAllocation": {
+      "overallGrade": "Unrated",
+      "roe": {
+        "current": null,
+        "grade": "-"
+      },
+      "roic": {
+        "current": null,
+        "grade": "-"
+      },
+      "debtEquity": {
+        "current": null,
+        "grade": "-"
+      },
+      "lastUpdated": null
+    },
+    "investmentThesis": {
+      "hypotheses": [],
+      "lastUpdated": null
+    },
+    "sellCriteria": [],
+    "recommendation": {
+      "action": "ANALYZE",
+      "reason": "Initial template created. Analysis required.",
+      "targetPrice": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [],
+    "priceHistory": []
+  },
+  "MSTR": {
+    "ticker": "MSTR",
+    "name": "MicroStrategy",
+    "assetClass": "US Stock",
+    "currentPrice": 188.39,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 150,
+      "range": {
+        "low": 120,
+        "high": 200
+      },
+      "method": "SOTP (70%) + Premium (30%)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 12.5,
+      "rating": "Weak",
+      "trend": "Stable",
+      "breakdown": {
+        "brand": 3,
+        "scale": 4,
+        "networkEffect": 1,
+        "switchingCosts": 2,
+        "technology": 2
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": -5,
+        "grade": "F"
+      },
+      "roic": {
+        "current": -2,
+        "grade": "F"
+      },
+      "debtEquity": {
+        "current": 2.5,
+        "grade": "D"
+      },
+      "overallGrade": "C",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "비트코인  돌파",
+          "valid": true,
+          "confidence": 80
+        },
+        {
+          "hypothesis": "프리미엄 유지 (레버리지 효과)",
+          "valid": true,
+          "confidence": 70
+        },
+        {
+          "hypothesis": "BTC Yield 성장 (연 6-10%)",
+          "valid": true,
+          "confidence": 90
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "비트코인 레버리지 플레이 (안전마진 -20%)",
+      "targetPrice": 200,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": true
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Trading Buy",
+        "condition": "BTC Dip"
+      },
+      {
+        "action": "Sell",
+        "condition": "Premium > 3x"
+      }
+    ],
+    "priceHistory": []
+  },
+  "005930.KS": {
+    "ticker": "005930.KS",
+    "name": "Samsung Electronics",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 104500,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 115000,
+      "range": {
+        "low": 95000,
+        "high": 135000
+      },
+      "method": "DCF (50%) + P/E (30%) + P/B (20%)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 12.8,
+      "rating": "Moderate",
+      "trend": "Leaking",
+      "breakdown": {
+        "brand": 5,
+        "scale": 5,
+        "networkEffect": 2,
+        "switchingCosts": 2,
+        "technology": 3
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 8.5,
+        "grade": "C"
+      },
+      "roic": {
+        "current": 7,
+        "grade": "C"
+      },
+      "debtEquity": {
+        "current": 0,
+        "grade": "A+"
+      },
+      "overallGrade": "B",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "HBM3E 추격 성공 (Nvidia 인증)",
+          "valid": true,
+          "confidence": 70
+        },
+        {
+          "hypothesis": "메모리 슈퍼사이클 (AI 수요)",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "파운드리 수율 안정화",
+          "valid": false,
+          "confidence": 40
+        }
+      ],
+      "overallStatus": "Mixed",
+      "validCount": "2/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "적정가 (안전마진 +9%), 파운드리 리스크 존재",
+      "targetPrice": 120000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": true
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Accumulate",
+        "condition": "Price < 100,000"
+      },
+      {
+        "action": "Trim",
+        "condition": "Price > 120,000"
+      }
+    ],
+    "priceHistory": []
+  },
+  "000660.KS": {
+    "ticker": "000660.KS",
+    "name": "SK hynix",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 535500,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 650000,
+      "range": {
+        "low": 580000,
+        "high": 720000
+      },
+      "method": "DCF (60%) + P/E (20%) + PEG (20%)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 18,
+      "rating": "Very Strong",
+      "trend": "Strengthening",
+      "breakdown": {
+        "brand": 4,
+        "networkEffect": 5,
+        "switchingCosts": 5,
+        "scale": 4,
+        "technology": 5
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 15.8,
+        "grade": "A"
+      },
+      "roic": {
+        "current": 15,
+        "grade": "A"
+      },
+      "debtEquity": {
+        "current": 0.3,
+        "grade": "B+"
+      },
+      "overallGrade": "A-",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "HBM 독점 지속 (MR-MUF 기술 우위)",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "AI 서버 수요 폭증 (엔비디아 파트너십)",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "메모리 산업의 Premium화 (Growth Sector)",
+          "valid": true,
+          "confidence": 85
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "STRONG BUY",
+      "reason": "저평가된 AI 황제 (안전마진 +21%)",
+      "targetPrice": 700000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 20,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Aggressive Buy",
+        "condition": "Price < 600,000"
+      },
+      {
+        "action": "Hold",
+        "condition": "Price > 700,000"
+      }
+    ],
+    "priceHistory": []
+  },
+  "017670.KS": {
+    "ticker": "017670.KS",
+    "name": "SK Telecom",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 53900,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 65000,
+      "range": {
+        "low": 60000,
+        "high": 70000
+      },
+      "method": "DDM (50%) + SOTP (30%) + P/E (20%)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 14,
+      "rating": "Strong",
+      "trend": "Stable",
+      "breakdown": {
+        "brand": 5,
+        "networkEffect": 4,
+        "switchingCosts": 3,
+        "scale": 4,
+        "technology": 3
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 9.6,
+        "grade": "B"
+      },
+      "roic": {
+        "current": 8,
+        "grade": "B"
+      },
+      "debtEquity": {
+        "current": 1.2,
+        "grade": "B"
+      },
+      "overallGrade": "B+",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "AI 데이터센터 성장 (매출 +53%)",
+          "valid": true,
+          "confidence": 85
+        },
+        {
+          "hypothesis": "UAM 상용화 (2025년 목표)",
+          "valid": true,
+          "confidence": 70
+        },
+        {
+          "hypothesis": "안정적 Cash Cow (5G 가입자 확대)",
+          "valid": true,
+          "confidence": 95
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "BUY",
+      "reason": "고배당(6.6%) + AI 성장 엔진 장착",
+      "targetPrice": 70000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": true
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Buy & Hold",
+        "condition": "Dividend Yield > 6%"
+      },
+      {
+        "action": "Monitor",
+        "condition": "AI Revenue Growth"
+      }
+    ],
+    "priceHistory": []
+  },
+  "196170.KQ": {
+    "ticker": "196170.KQ",
+    "name": "Alteogen",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 535000,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 600000,
+      "range": {
+        "low": 500000,
+        "high": 700000
+      },
+      "method": "rNPV (60%) + P/E (40%)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 16.8,
+      "rating": "Very Strong",
+      "trend": "Strengthening",
+      "breakdown": {
+        "brand": 4,
+        "networkEffect": 3,
+        "switchingCosts": 5,
+        "scale": 5,
+        "technology": 5
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 25,
+        "grade": "A"
+      },
+      "roic": {
+        "current": 20,
+        "grade": "A"
+      },
+      "debtEquity": {
+        "current": 0.1,
+        "grade": "A+"
+      },
+      "overallGrade": "A",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "Keytruda SC 상용화 (FDA 승인)",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "추가 L/O 계약 (ADC SC)",
+          "valid": true,
+          "confidence": 80
+        },
+        {
+          "hypothesis": "실적 퀀텀 점프 (매출 900% 폭증)",
+          "valid": true,
+          "confidence": 90
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "BUY",
+      "reason": "글로벌 바이오 플랫폼 리더 (안전마진 +12%)",
+      "targetPrice": 700000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Buy on Dip",
+        "condition": "Price < 500,000"
+      },
+      {
+        "action": "Hold",
+        "condition": "Price > 700,000"
+      }
+    ],
+    "priceHistory": []
+  },
+  "034020.KS": {
+    "ticker": "034020.KS",
+    "name": "Doosan Enerbility",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 78400,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 65000,
+      "range": {
+        "low": 55000,
+        "high": 80000
+      },
+      "method": "DCF (50%) + P/E (30%) + Order Backlog (20%)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 14.5,
+      "rating": "Weak",
+      "trend": "Stable",
+      "breakdown": {
+        "brand": 3,
+        "scale": 5,
+        "networkEffect": 2,
+        "switchingCosts": 3,
+        "technology": 3
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 1,
+        "grade": "D"
+      },
+      "roic": {
+        "current": 2.5,
+        "grade": "D"
+      },
+      "debtEquity": {
+        "current": 1.5,
+        "grade": "C"
+      },
+      "overallGrade": "C-",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "SMR 파운드리 성장 (NuScale 협력)",
+          "valid": true,
+          "confidence": 60
+        },
+        {
+          "hypothesis": "대형 원전 수주 (체코)",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "가스터빈 국산화",
+          "valid": true,
+          "confidence": 50
+        }
+      ],
+      "overallStatus": "Mixed",
+      "validCount": "2/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "SELL",
+      "reason": "과도한 기대감 (안전마진 -17%), 실적 개선 지연",
+      "targetPrice": 65000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -10,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": true
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Profit Taking",
+        "condition": "Price > 80,000"
+      },
+      {
+        "action": "Wait",
+        "condition": "Price < 60,000"
+      }
+    ],
+    "priceHistory": []
+  },
+  "267260.KS": {
+    "ticker": "267260.KS",
+    "name": "HD Hyundai Electric",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 800000,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 950000,
+      "range": {
+        "low": 850000,
+        "high": 1100000
+      },
+      "method": "DCF (60%) + P/E (20%) + Backlog (20%)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 15.6,
+      "rating": "Strong",
+      "trend": "Strengthening",
+      "breakdown": {
+        "brand": 4,
+        "scale": 4,
+        "networkEffect": 3,
+        "switchingCosts": 5,
+        "technology": 3
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 38,
+        "grade": "S"
+      },
+      "roic": {
+        "current": 27,
+        "grade": "S"
+      },
+      "debtEquity": {
+        "current": 0.5,
+        "grade": "A"
+      },
+      "overallGrade": "S",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "AI 데이터센터 전력 수요 폭증",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "미국 노후 전력망 교체 사이클",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "공급자 우위 시장 (Seller's Market) 지속",
+          "valid": true,
+          "confidence": 85
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "BUY",
+      "reason": "AI 전력 슈퍼사이클 대장주 (안전마진 +19%)",
+      "targetPrice": 1000000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Buy",
+        "condition": "Price < 850,000"
+      },
+      {
+        "action": "Hold",
+        "condition": "Price > 1,000,000"
+      }
+    ],
+    "priceHistory": []
+  },
+  "010950.KS": {
+    "ticker": "010950.KS",
+    "name": "S-Oil",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 80900,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 90000,
+      "range": {
+        "low": 80000,
+        "high": 100000
+      },
+      "method": "P/B (50%) + DDM (30%) + EPV (20%)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 15,
+      "rating": "Moderate",
+      "trend": "Stable",
+      "breakdown": {
+        "brand": 4,
+        "scale": 4,
+        "networkEffect": 2,
+        "switchingCosts": 3,
+        "technology": 3
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 8,
+        "grade": "C"
+      },
+      "roic": {
+        "current": 6,
+        "grade": "C"
+      },
+      "debtEquity": {
+        "current": 0.8,
+        "grade": "B"
+      },
+      "overallGrade": "C+",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "정제마진 회복 (Q3 흑자전환)",
+          "valid": true,
+          "confidence": 85
+        },
+        {
+          "hypothesis": "샤힌 프로젝트 순항 (2026년 완공)",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "유가 안정 (-80 밴드)",
+          "valid": true,
+          "confidence": 70
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "적정 주가 (안전마진 +10%), 과도기적 단계",
+      "targetPrice": 100000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 20,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Accumulate",
+        "condition": "Price < 80,000"
+      },
+      {
+        "action": "Hold",
+        "condition": "Price > 90,000"
+      }
+    ],
+    "priceHistory": []
+  },
+  "000155.KS": {
+    "ticker": "000155.KS",
+    "name": "Doosan Corp Preferred",
+    "assetClass": "Domestic Stock",
+    "currentPrice": 524000,
+    "lastUpdated": "2025-12-04",
+    "intrinsicValue": {
+      "midpoint": 350000,
+      "range": {
+        "low": 300000,
+        "high": 400000
+      },
+      "method": "DDM (50%) + Gap Analysis (30%)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-04",
+      "history": []
+    },
+    "moat": {
+      "score": 6,
+      "rating": "No Moat",
+      "trend": "Stable",
+      "breakdown": {
+        "brand": 1,
+        "scale": 2,
+        "networkEffect": 0,
+        "switchingCosts": 2,
+        "technology": 1
+      },
+      "lastUpdated": "2025-12-04"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 5,
+        "grade": "D"
+      },
+      "roic": {
+        "current": 4,
+        "grade": "D"
+      },
+      "debtEquity": {
+        "current": 1.5,
+        "grade": "C"
+      },
+      "overallGrade": "D",
+      "lastUpdated": "2025-12-04"
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "배당 투자 (시가배당률 0.4%)",
+          "valid": false,
+          "confidence": 99
+        },
+        {
+          "hypothesis": "지배구조 수혜 (합병 무산)",
+          "valid": false,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "저평가 매력 (괴리율 축소)",
+          "valid": false,
+          "confidence": 85
+        }
+      ],
+      "overallStatus": "Broken",
+      "validCount": "0/3",
+      "lastUpdated": "2025-12-04"
+    },
+    "recommendation": {
+      "action": "SELL",
+      "reason": "투기적 버블 (안전마진 -49%)",
+      "targetPrice": 350000,
+      "stopLoss": null
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": true
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Strong Sell",
+        "condition": "Now"
+      },
+      {
+        "action": "Avoid",
+        "condition": "Always"
+      }
+    ],
+    "priceHistory": []
+  }
+}
