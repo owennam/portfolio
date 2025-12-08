@@ -1,10 +1,15 @@
+export function normalizeTicker(ticker) {
+    if (!ticker) return ticker;
+    return ticker.toUpperCase().replace(/\.(KS|KQ)$/, '');
+}
+
 export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1) {
     // Group by ticker
     const holdings = {};
 
     trades.forEach(trade => {
         const { type, price, quantity, assetClass, account = 'General' } = trade;
-        const ticker = trade.ticker.toUpperCase();
+        const ticker = normalizeTicker(trade.ticker);
         const qty = parseFloat(quantity);
         const cost = parseFloat(price);
         const key = `${ticker}-${account}`;
@@ -59,8 +64,8 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
     Object.values(holdings).forEach(holding => {
         if (holding.quantity <= 0.000001) return; // Ignore sold out positions
 
-        const currentPriceObj = currentPrices.find(p => p.ticker.toUpperCase() === holding.ticker);
-        const currentPrice = currentPriceObj ? currentPriceObj.price : holding.avgPrice;
+        const currentPriceObj = currentPrices.find(p => normalizeTicker(p.ticker) === holding.ticker);
+        const currentPrice = currentPriceObj && !currentPriceObj.error ? currentPriceObj.price : holding.avgPrice;
 
         let currentValue = holding.quantity * currentPrice;
         let investedValue = holding.totalCost;

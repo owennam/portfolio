@@ -100,6 +100,29 @@ export async function GET() {
             }
         });
 
+        // Sorting Logic
+        const getPriority = (action, type) => {
+            const act = (action || '').toUpperCase();
+            if (type === 'overheated') {
+                // Order: SELL, HOLD, BUY
+                if (act.includes('SELL')) return 1; // Covers SELL, STRONG SELL
+                if (act === 'HOLD') return 2;
+                if (act.includes('BUY')) return 3; // Covers BUY, STRONG BUY
+                return 4;
+            } else {
+                // Order: STRONG BUY, BUY, HOLD, SELL
+                if (act === 'STRONG BUY') return 1;
+                if (act === 'BUY') return 2;
+                if (act === 'HOLD') return 3;
+                if (act.includes('SELL')) return 4;
+                return 5;
+            }
+        };
+
+        alerts.overheated.sort((a, b) => getPriority(a.recommendation, 'overheated') - getPriority(b.recommendation, 'overheated'));
+        alerts.undervalued.sort((a, b) => getPriority(a.recommendation, 'normal') - getPriority(b.recommendation, 'normal'));
+        alerts.neutral.sort((a, b) => getPriority(a.recommendation, 'normal') - getPriority(b.recommendation, 'normal'));
+
         return Response.json(alerts);
 
     } catch (error) {

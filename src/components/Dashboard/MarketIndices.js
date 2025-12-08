@@ -57,7 +57,7 @@ export default function MarketIndices() {
         };
 
         fetchIndices();
-        const interval = setInterval(fetchIndices, 60000); // Refresh every minute
+        const interval = setInterval(fetchIndices, 600000); // Refresh every 10 minutes
         return () => clearInterval(interval);
     }, []);
 

@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import yahooFinance from 'yahoo-finance2';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
+import { fetchMacroData } from '@/lib/macroUtils';
 
 const yf = new yahooFinance({ suppressNotices: ['yahooSurvey'] });
 
@@ -74,7 +75,15 @@ export async function GET() {
         // 5. Calculate Stats
         const stats = calculatePortfolioStats(trades, prices, exchangeRate);
 
-        // 6. Prepare Response Data
+        // 6. Fetch Liquidity Data
+        let liquidity = null;
+        try {
+            liquidity = await fetchMacroData();
+        } catch (e) {
+            console.error('Failed to fetch liquidity for AI data:', e);
+        }
+
+        // 7. Prepare Response Data
         const responseData = {
             summary: {
                 totalValue: Math.round(stats.totalValue),
@@ -99,7 +108,8 @@ export async function GET() {
                 };
             }).sort((a, b) => b.totalValue - a.totalValue),
             recentTrades: trades.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20),
-            latestJournal: journals.sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null
+            latestJournal: journals.sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null,
+            liquidity
         };
 
         return Response.json(responseData);

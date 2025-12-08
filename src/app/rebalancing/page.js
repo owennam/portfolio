@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { calculatePortfolioStats } from '@/lib/portfolioUtils';
+import { calculatePortfolioStats, normalizeTicker } from '@/lib/portfolioUtils';
 import { Trash2 } from 'lucide-react';
 
 export default function RebalancingPage() {
@@ -35,11 +35,13 @@ export default function RebalancingPage() {
                 setExchangeRate(rate);
 
                 // 1. Identify held tickers
-                const heldTickers = new Set(tradesData.map(t => t.ticker));
+                const heldTickers = new Set(tradesData.map(t => normalizeTicker(t.ticker)));
 
                 // 2. Identify potential simulation tickers from targets
                 const potentialSimTickers = new Set();
                 Object.keys(targetsData).forEach(key => {
+                    if (key.startsWith('Category-')) return; // Skip category targets
+
                     let ticker = key;
                     // Attempt to parse "Ticker-Account" format
                     // We assume account is one of the known types if present at the end
@@ -50,10 +52,12 @@ export default function RebalancingPage() {
                             ticker = parts.slice(0, -1).join('-');
                         }
                     }
-                    potentialSimTickers.add(ticker);
+                    potentialSimTickers.add(normalizeTicker(ticker));
                 });
 
                 // Combine all tickers to fetch prices
+                // Note: We need original tickers for fetching if possible, but we only have normalized ones from trades/targets mostly.
+                // But api/prices handles normalized tickers (e.g. 005930) by trying suffixes.
                 const allTickers = [...new Set([...heldTickers, ...potentialSimTickers])];
 
                 let currentPrices = [];
@@ -72,7 +76,7 @@ export default function RebalancingPage() {
                 const restoredSimAssets = [];
 
                 Object.keys(targetsData).forEach(key => {
-                    if (heldAssetKeys.has(key)) return; // It's a real asset
+                    if (key.startsWith('Category-')) return; // Skip category targets
 
                     // Parse key to reconstruct asset info
                     let ticker = key;
@@ -86,8 +90,12 @@ export default function RebalancingPage() {
                         }
                     }
 
-                    const priceData = currentPrices.find(p => p.ticker === ticker);
-                    if (priceData) {
+                    // Check if this is a held asset (using normalized ticker)
+                    const normalizedTicker = normalizeTicker(ticker);
+                    if (heldAssetKeys.has(`${normalizedTicker}-${account}`)) return;
+
+                    const priceData = currentPrices.find(p => normalizeTicker(p.ticker) === normalizedTicker);
+                    if (priceData && !priceData.error) {
                         const isUS = priceData.currency === 'USD';
                         let assetClass = 'Domestic Stock';
                         if (isUS) assetClass = 'US Stock';
