@@ -1005,5 +1005,50 @@
     "exchangeRate": 1469.53,
     "account": "General",
     "name": "Bloom Energy Corporation"
+  },
+  {
+    "id": "7475a2fc-7417-484e-b2f0-1ca2b81a4440",
+    "createdAt": "2025-12-09T20:22:07.791Z",
+    "date": "2025-12-09",
+    "type": "Buy",
+    "assetClass": "US Stock",
+    "ticker": "ccj",
+    "price": "90",
+    "quantity": "100",
+    "fee": "6.30",
+    "reason": "",
+    "exchangeRate": 1469,
+    "account": "General",
+    "name": "Cameco Corporation"
+  },
+  {
+    "id": "58380733-e17e-4efa-9527-03f13bde3dc6",
+    "createdAt": "2025-12-09T20:22:22.672Z",
+    "date": "2025-12-09",
+    "type": "Buy",
+    "assetClass": "US Stock",
+    "ticker": "mp",
+    "price": "60",
+    "quantity": "100",
+    "fee": "4.20",
+    "reason": "",
+    "exchangeRate": 1469,
+    "account": "General",
+    "name": "MP Materials Corp."
+  },
+  {
+    "id": "f6fe9e7f-9ffc-4947-9008-1de25f06944c",
+    "createdAt": "2025-12-09T20:22:44.956Z",
+    "date": "2025-12-09",
+    "type": "Sell",
+    "assetClass": "US Stock",
+    "ticker": "mstr",
+    "price": "182",
+    "quantity": "50",
+    "fee": "6.37",
+    "reason": "",
+    "exchangeRate": 1469,
+    "account": "General",
+    "name": "Strategy Inc"
   }
 ]
