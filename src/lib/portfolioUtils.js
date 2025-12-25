@@ -7,7 +7,19 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
     // Group by ticker
     const holdings = {};
 
-    trades.forEach(trade => {
+    // Sort trades: Date ascending, then by type (Buy before Sell for same day is safer, or createdAt)
+    const sortedTrades = [...trades].sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+        // Same date: Process Buys before Sells to avoid negative dips if intraday
+        if (a.type === 'Buy' && b.type === 'Sell') return -1;
+        if (a.type === 'Sell' && b.type === 'Buy') return 1;
+        return 0;
+    });
+
+    sortedTrades.forEach(trade => {
         const { type, price, quantity, assetClass, account = 'General' } = trade;
         const ticker = normalizeTicker(trade.ticker);
         const qty = parseFloat(quantity);

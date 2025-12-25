@@ -60,7 +60,7 @@ export default function AssetDetailClient({ type }) {
     if (!targetAssetClass) return <div className="container">Invalid Asset Class</div>;
 
     const stats = calculatePortfolioStats(trades, prices, exchangeRate);
-    const holdings = stats.assets.filter(a => a.assetClass === targetAssetClass);
+    const holdings = stats.assets.filter(a => a.assetClass === targetAssetClass).sort((a, b) => b.roi - a.roi);
 
     // Grouping for Domestic
     const domesticGroups = {

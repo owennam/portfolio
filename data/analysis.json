@@ -888,6 +888,230 @@
     ],
     "priceHistory": []
   },
+  "AVGO": {
+    "ticker": "AVGO",
+    "name": "Broadcom Inc.",
+    "assetClass": "US Stock",
+    "currentPrice": 341.00,
+    "lastUpdated": "2025-12-17",
+    "intrinsicValue": {
+      "midpoint": 280,
+      "range": {
+        "low": 250,
+        "high": 300
+      },
+      "method": "DCF (Base Case: 12% Growth, 11% Discount Rate)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-17",
+      "history": [],
+      "note": "Realistic Estimate: $250-300. Base Case Target: $350. Bull Case: $500. Bear Case: $200."
+    },
+    "moat": {
+      "score": 18,
+      "rating": "Wide",
+      "trend": "Stable",
+      "breakdown": {
+        "networkEffect": 4,
+        "switchingCosts": 5,
+        "intangibleAssets": 4,
+        "costAdvantage": 4,
+        "efficientScale": 4
+      },
+      "lastUpdated": "2025-12-17",
+      "notes": "Custom AI ASIC 독점적 지위. VMware 생태계 Lock-in. Mission-Critical 인프라."
+    },
+    "capitalAllocation": {
+      "overallGrade": "Excellent",
+      "roe": {
+        "current": 30,
+        "grade": "Excellent"
+      },
+      "roic": {
+        "current": 28,
+        "grade": "Excellent"
+      },
+      "debtEquity": {
+        "current": 1.1,
+        "grade": "Moderate"
+      },
+      "lastUpdated": "2025-12-17",
+      "notes": "VMware 인수 성공적 통합 중. 15년 연속 배당 증가."
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "AI 칩 시장 독점적 지위 (Custom ASIC 70% 점유율)",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "VMware 수익화 가속 & Recurring Revenue 확보",
+          "valid": true,
+          "confidence": 85
+        },
+        {
+          "hypothesis": "18개월 Backlog ($73B)로 인한 실적 가시성",
+          "valid": true,
+          "confidence": 90
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-17"
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "장기 경쟁 우위 강력하나 내재 가치($250-300) 대비 고평가. 조정 시 매수 기회.",
+      "targetPrice": 350,
+      "stopLoss": null,
+      "positionSize": "1.5% (Target 2-3%)",
+      "entryStrategy": "Wait for < $250"
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -14,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 16,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Hold",
+        "condition": "Price > $250"
+      },
+      {
+        "action": "Accumulate",
+        "condition": "Price < $250"
+      }
+    ],
+    "priceHistory": [],
+    "riskFactors": [
+      "Valuation Risk: P/E 35x, P/FCF 28x 과대평가",
+      "Margin Compression: AI 사업 비중 확대로 인한 마진 희석 우려",
+      "Customer Concentration: Big Tech 5개사에 매출 집중",
+      "Competition: NVIDIA의 Custom ASIC 시장 진출 가능성"
+    ],
+    "catalysts": [
+      "Q1 2026 실적 (AI 매출 $8.2B 달성 여부)",
+      "XPU 신규 고객(OpenAI 등) 확보 발표",
+      "VMware 구독 전환율 90%+ 달성",
+      "AI CapEx 지속 증가"
+    ]
+  },
+  "MU": {
+    "ticker": "MU",
+    "name": "Micron Technology, Inc.",
+    "assetClass": "US Stock",
+    "currentPrice": 241.40,
+    "lastUpdated": "2025-12-17",
+    "intrinsicValue": {
+      "midpoint": 272.5,
+      "range": {
+        "low": 260,
+        "high": 285
+      },
+      "method": "Forward Earnings Power (FY26 EPS $22 x 12.5x)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-17",
+      "history": [],
+      "note": "Intrinsic Value: $260-285. Current price lacks 30% Margin of Safety."
+    },
+    "moat": {
+      "score": 18,
+      "rating": "Technological Oligopoly",
+      "trend": "Strengthening",
+      "breakdown": {
+        "networkEffect": 3,
+        "switchingCosts": 4,
+        "intangibleAssets": 4,
+        "costAdvantage": 4,
+        "efficientScale": 5
+      },
+      "lastUpdated": "2025-12-17",
+      "notes": "HBM3E entry barrier very high. Big 3 Oligopoly."
+    },
+    "capitalAllocation": {
+      "overallGrade": "Good",
+      "roe": {
+        "current": 20,
+        "grade": "Improving"
+      },
+      "roic": {
+        "current": 15,
+        "grade": "Good"
+      },
+      "debtEquity": {
+        "current": 0.5,
+        "grade": "Healthy"
+      },
+      "lastUpdated": "2025-12-17",
+      "notes": "Rapid FCF improvement. Active deleveraging."
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "HBM3E Power Efficiency Advantage (30%)",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "Oligopoly Structure (Big 3) Pricing Power",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "Samsung Qualification Failure Continuing",
+          "valid": true,
+          "confidence": 80
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-17"
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "Wonderful company at fair price. No margin of safety for fresh buy.",
+      "targetPrice": 280,
+      "stopLoss": null,
+      "positionSize": "3-5%",
+      "entryStrategy": "Buy < $220"
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 12,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Hold",
+        "condition": "Price > $220"
+      },
+      {
+        "action": "Accumulate",
+        "condition": "Price < $220"
+      }
+    ],
+    "priceHistory": [],
+    "riskFactors": [
+      "Memory Cycle Boom-Bust ('The Cliff')",
+      "China Decoupling (Revenue loss)",
+      "CapEx oversupply risk if AI slows"
+    ],
+    "catalysts": [
+      "Samsung HBM3E Qualification Failure (Permanent share gain)",
+      "Gross Margin > 40% sustainable break",
+      "NVIDIA Lead times staying > 20 weeks"
+    ]
+  },
   "NET": {
     "ticker": "NET",
     "name": "Cloudflare, Inc.",
@@ -3266,5 +3490,464 @@
     ],
     "rating": 4,
     "ratingLabel": "Buy (Supply Chain Hedge)"
+  },
+  "207940.KS": {
+    "ticker": "207940.KS",
+    "name": "Samsung Biologics",
+    "assetClass": "Korean Stock",
+    "currentPrice": 1738000,
+    "lastUpdated": "2025-12-19",
+    "intrinsicValue": {
+      "midpoint": 2200000,
+      "range": {
+        "low": 1700000,
+        "high": 2500000
+      },
+      "method": "EPS (2026E) x Target P/E 55x",
+      "confidence": "High",
+      "lastUpdated": "2025-12-19",
+      "history": []
+    },
+    "moat": {
+      "score": 19,
+      "rating": "Wide",
+      "trend": "Strengthening",
+      "breakdown": {
+        "scale": 5,
+        "switchingCosts": 5,
+        "networkEffect": 3,
+        "intangibleAssets": 4,
+        "costAdvantage": 5
+      },
+      "lastUpdated": "2025-12-19"
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": null,
+        "grade": "A"
+      },
+      "roic": {
+        "current": null,
+        "grade": "A"
+      },
+      "debtEquity": {
+        "current": null,
+        "grade": "A"
+      },
+      "overallGrade": "A",
+      "lastUpdated": "2025-12-19",
+      "notes": "High OPM (~40%) and FCF turning positive despite heavy Capex."
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "CDMO Super Gap: Plant 5 early online (Apr 2025) + 784kL Capacity",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "BioSecure Act Beneficiary: Replacing WuXi",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "Portfolio Expansion: ADC & CGT",
+          "valid": true,
+          "confidence": 85
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-19"
+    },
+    "sellCriteria": [
+      {
+        "condition": "Price > 2,500,000 KRW",
+        "triggered": false
+      },
+      {
+        "condition": "Aggressive expansion by US/EU competitors",
+        "triggered": false
+      }
+    ],
+    "recommendation": {
+      "action": "BUY",
+      "reason": "Dominant CDMO with geopolitical tailwinds (BioSecure Act). Undervalued vs Growth.",
+      "targetPrice": 2200000,
+      "stopLoss": null,
+      "positionSize": "5-8% (Core Holdings)"
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 26,
+        "triggered": false
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Accumulate",
+        "condition": "Price < 1,700,000 KRW"
+      }
+    ],
+    "priceHistory": [],
+    "catalysts": [
+      "Plant 5 Operation (Apr 2025)",
+      "BioSecure Act Concrete Contracts",
+      "ADC Dedicated Plant Operation"
+    ],
+    "riskFactors": [
+      "Valuation Premium Volatility",
+      "Geopolitical Complexity (Supply Chain)"
+    ],
+    "rating": 5,
+    "ratingLabel": "Strong Buy"
+  },
+  "LITE": {
+    "ticker": "LITE",
+    "name": "Lumentum Holdings Inc.",
+    "assetClass": "US Stock",
+    "currentPrice": 374.50,
+    "lastUpdated": "2025-12-22",
+    "intrinsicValue": {
+      "midpoint": 274,
+      "range": {
+        "low": 115,
+        "high": 380
+      },
+      "method": "DCF (Bearish $115) vs Market (Bullish $380)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-22",
+      "history": [],
+      "note": "DCF Low ($115) reflects negative FCF & High Debt risks. Market Target ($274-$380) prices in monopoly premium & growth."
+    },
+    "moat": {
+      "score": 19,
+      "rating": "Wide (Temporal)",
+      "trend": "Stable",
+      "breakdown": {
+        "networkEffect": 1,
+        "switchingCosts": 4,
+        "intangibleAssets": 5,
+        "costAdvantage": 5,
+        "efficientScale": 4
+      },
+      "lastUpdated": "2025-12-22",
+      "notes": "Laser Chip Monopoly (50-60% Share). 3-5 Year Window before Silicon Photonics threat."
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 13.4,
+        "grade": "B"
+      },
+      "roic": {
+        "current": -1.68,
+        "grade": "F"
+      },
+      "debtEquity": {
+        "current": 4.15,
+        "grade": "F"
+      },
+      "overallGrade": "C-",
+      "lastUpdated": "2025-12-22",
+      "notes": "High leverage (D/E 415%) and negative FCF are major risks despite monopoly status."
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "AI Datacenter Expansion (800G -> 1.6T Cycle)",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "Monopoly Pricing Power in EML Chips",
+          "valid": true,
+          "confidence": 90
+        },
+        {
+          "hypothesis": "Turnaround to Positive FCF in FY2026",
+          "valid": true,
+          "confidence": 70
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-22"
+    },
+    "sellCriteria": [
+      {
+        "condition": "Silicon Photonics Mass Adoption (TSMC)",
+        "triggered": false
+      },
+      {
+        "condition": "Debt Crisis / Credit Downgrade",
+        "triggered": false
+      },
+      {
+        "condition": "P/E > 100 Sustained",
+        "triggered": true
+      }
+    ],
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "Monopoly requires paying a premium, but P/E 248x is too high. Wait for correction.",
+      "targetPrice": 280,
+      "stopLoss": 318,
+      "positionSize": "8-10% (Target)"
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -30,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 15,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Buy Dip",
+        "condition": "Price < $280"
+      },
+      {
+        "action": "Strong Buy",
+        "condition": "Price < $260"
+      }
+    ],
+    "priceHistory": [],
+    "rating": 4,
+    "ratingLabel": "Buy on Dip"
+  },
+  "VRT": {
+    "ticker": "VRT",
+    "name": "Vertiv Holdings Co",
+    "assetClass": "US Stock",
+    "currentPrice": 159.83,
+    "lastUpdated": "2025-12-22",
+    "intrinsicValue": {
+      "midpoint": 140,
+      "range": {
+        "low": 90,
+        "high": 203
+      },
+      "method": "DCF ($90) vs Analyst Avg ($193)",
+      "confidence": "Medium",
+      "lastUpdated": "2025-12-22",
+      "history": [],
+      "note": "Great business priced for perfection. Intrinsic value heavily dependent on sustained 30% growth."
+    },
+    "moat": {
+      "score": 16,
+      "rating": "Narrow",
+      "trend": "Strengthening",
+      "breakdown": {
+        "networkEffect": 1,
+        "switchingCosts": 4,
+        "intangibleAssets": 5,
+        "costAdvantage": 3,
+        "efficientScale": 3
+      },
+      "lastUpdated": "2025-12-22",
+      "notes": "Liquid Cooling 'Gold Standard' + NVIDIA Partnership. Competition from Eaton is increasing."
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 38.9,
+        "grade": "S"
+      },
+      "roic": {
+        "current": 18.8,
+        "grade": "A"
+      },
+      "debtEquity": {
+        "current": 0.92,
+        "grade": "A"
+      },
+      "overallGrade": "A",
+      "lastUpdated": "2025-12-22",
+      "notes": "Excellent capital efficiency and FCF generation ($1.1B)."
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "Liquid Cooling Tam Growth (30% CAGR)",
+          "valid": true,
+          "confidence": 95
+        },
+        {
+          "hypothesis": "NVIDIA GB200 Partnership Lock-in",
+          "valid": true,
+          "confidence": 85
+        },
+        {
+          "hypothesis": "Margin Expansion via Service/Software",
+          "valid": true,
+          "confidence": 75
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-22"
+    },
+    "sellCriteria": [
+      {
+        "condition": "Eaton/Schneider Market Share > 40%",
+        "triggered": false
+      },
+      {
+        "condition": "Valuation compression (Sector rotation)",
+        "triggered": false
+      }
+    ],
+    "recommendation": {
+      "action": "HOLD",
+      "reason": "Wonderful business at a fair-to-high price. Wait for better entry.",
+      "targetPrice": 140,
+      "stopLoss": 135,
+      "positionSize": "5-7% (Target)"
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": -20,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 12,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Buy Dip",
+        "condition": "Price < $140"
+      },
+      {
+        "action": "Strong Buy",
+        "condition": "Price < $130"
+      }
+    ],
+    "priceHistory": [],
+    "rating": 3.5,
+    "ratingLabel": "Hold"
+  },
+  "LIN": {
+    "ticker": "LIN",
+    "name": "Linde plc",
+    "assetClass": "US Stock",
+    "currentPrice": 421.00,
+    "lastUpdated": "2025-12-22",
+    "intrinsicValue": {
+      "midpoint": 525,
+      "range": {
+        "low": 500,
+        "high": 550
+      },
+      "method": "DCF Base Case ($500) - Bull Case ($550+)",
+      "confidence": "High",
+      "lastUpdated": "2025-12-22",
+      "history": [],
+      "note": "Conservative DCF implies $480, Base $500+. Market premium justified by 'Forever' quality."
+    },
+    "moat": {
+      "score": 24,
+      "rating": "Wide",
+      "trend": "Strengthening",
+      "breakdown": {
+        "networkEffect": 2,
+        "switchingCosts": 5,
+        "intangibleAssets": 5,
+        "costAdvantage": 5,
+        "efficientScale": 5
+      },
+      "lastUpdated": "2025-12-22",
+      "notes": "Perfect Monopoly. Density Economics + Long-term Contracts create an impenetrable fortress."
+    },
+    "capitalAllocation": {
+      "roe": {
+        "current": 18.2,
+        "grade": "A+"
+      },
+      "roic": {
+        "current": 12.5,
+        "grade": "A"
+      },
+      "debtEquity": {
+        "current": 0.45,
+        "grade": "A+"
+      },
+      "overallGrade": "S",
+      "lastUpdated": "2025-12-22",
+      "notes": "Generates predictable FCF like a utility, grows like a compounder."
+    },
+    "investmentThesis": {
+      "hypotheses": [
+        {
+          "hypothesis": "Regional Monopoly via Density Economics",
+          "valid": true,
+          "confidence": 98
+        },
+        {
+          "hypothesis": "Hidden Assets: Space (Starship) & Hydrogen/CCUS",
+          "valid": true,
+          "confidence": 85
+        },
+        {
+          "hypothesis": "Inflation-Protected Growth (Pricing Power)",
+          "valid": true,
+          "confidence": 95
+        }
+      ],
+      "overallStatus": "Valid",
+      "validCount": "3/3",
+      "lastUpdated": "2025-12-22"
+    },
+    "sellCriteria": [
+      {
+        "condition": "P/E > 35x (Overvaluation)",
+        "triggered": false
+      },
+      {
+        "condition": "Structural Moat Decay (New Entrants)",
+        "triggered": false
+      },
+      {
+        "condition": "Management Allocation Failure",
+        "triggered": false
+      }
+    ],
+    "recommendation": {
+      "action": "BUY",
+      "reason": "The 'Perfect Monopoly'. 18% Safety Margin for a business of this quality is a signal to buy.",
+      "targetPrice": 525,
+      "stopLoss": null,
+      "positionSize": "10-15% (Core Holding)"
+    },
+    "alerts": {
+      "marginOfSafety": {
+        "threshold": 15,
+        "triggered": true
+      },
+      "moatWeakening": {
+        "threshold": 20,
+        "triggered": false
+      }
+    },
+    "nextActions": [
+      {
+        "action": "Buy 50%",
+        "condition": "Price < $425"
+      },
+      {
+        "action": "Buy 50% (Add)",
+        "condition": "Price < $400"
+      }
+    ],
+    "priceHistory": [],
+    "rating": 5,
+    "ratingLabel": "Strong Buy"
   }
 }

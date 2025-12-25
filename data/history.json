@@ -99,5 +99,101 @@
     "netWorth": 3393115580.954418,
     "totalAssets": 4292647796.954418,
     "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-15",
+    "totalValue": 1728558331.0359998,
+    "investedAmount": 1646768344.2714543,
+    "netWorth": 3375136482.036,
+    "totalAssets": 4274668698.036,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-16",
+    "totalValue": 1689308921.2971,
+    "investedAmount": 1649516112.1331725,
+    "netWorth": 3335887072.2971,
+    "totalAssets": 4235419288.2971,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-17",
+    "totalValue": 1674883902.4842403,
+    "investedAmount": 1612888680.9983,
+    "netWorth": 3321462053.4842405,
+    "totalAssets": 4220994269.4842405,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-18",
+    "totalValue": 1652803342.6670399,
+    "investedAmount": 1616215417.9708002,
+    "netWorth": 3299381493.66704,
+    "totalAssets": 4198913709.66704,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-19",
+    "totalValue": 1759563865.0897226,
+    "investedAmount": 1704158209.7634,
+    "netWorth": 3406142016.0897226,
+    "totalAssets": 4305674232.089723,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-20",
+    "totalValue": 1773008624.942665,
+    "investedAmount": 1693565898.348,
+    "netWorth": 3419586775.942665,
+    "totalAssets": 4319118991.942665,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-21",
+    "totalValue": 1769104436.4869306,
+    "investedAmount": 1695489629.1200001,
+    "netWorth": 3415682587.486931,
+    "totalAssets": 4315214803.486931,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-22",
+    "totalValue": 1805326555.0612178,
+    "investedAmount": 1699953609.1600003,
+    "netWorth": 3451904706.0612183,
+    "totalAssets": 4351436922.061218,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-23",
+    "totalValue": 1811209358.761576,
+    "investedAmount": 1730125352.9786,
+    "netWorth": 3457787509.7615757,
+    "totalAssets": 4357319725.761576,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-24",
+    "totalValue": 1820770543.4343233,
+    "investedAmount": 1734706612.2187,
+    "netWorth": 3467348694.4343233,
+    "totalAssets": 4366880910.434323,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-25",
+    "totalValue": 1781285201.9999433,
+    "investedAmount": 1704825130.4087,
+    "netWorth": 3427863352.999943,
+    "totalAssets": 4327395568.999943,
+    "liabilities": 899532216
+  },
+  {
+    "date": "2025-12-26",
+    "totalValue": 1789935214.739256,
+    "investedAmount": 1707459223.658,
+    "netWorth": 3436513365.739256,
+    "totalAssets": 4336045581.739256,
+    "liabilities": 899532216
   }
 ]
