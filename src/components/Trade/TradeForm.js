@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import StockAutocomplete from '@/components/StockAutocomplete';
 
 export default function TradeForm({ onTradeAdded }) {
     const [formData, setFormData] = useState({
@@ -35,12 +37,24 @@ export default function TradeForm({ onTradeAdded }) {
         fetchRate();
     }, []);
 
+    const { user } = useAuth(); // Get user from context
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
         try {
+            const token = await user.getIdToken();
             const res = await fetch('/api/trades', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ ...formData, name: stockName }),
             });
             if (res.ok) {
@@ -49,9 +63,12 @@ export default function TradeForm({ onTradeAdded }) {
                 // Reset form (keep date/type/account/exchangeRate)
                 setFormData(prev => ({ ...prev, ticker: '', price: '', quantity: '', fee: '', reason: '' }));
                 setStockName('');
+            } else {
+                alert('저장 실패: ' + res.statusText);
             }
         } catch (error) {
             console.error('Failed to add trade', error);
+            alert('저장 중 오류 발생');
         }
     };
 
@@ -104,7 +121,7 @@ export default function TradeForm({ onTradeAdded }) {
 
         let searchTicker = formData.ticker;
         // Auto-append -USD for Crypto if not present
-        if (formData.assetClass === 'Crypto' && !searchTicker.includes('-')) {
+        if (formData.category === '암호화폐' && !searchTicker.includes('-')) {
             searchTicker = `${searchTicker.toUpperCase()}-USD`;
             setFormData(prev => ({ ...prev, ticker: searchTicker }));
         }
@@ -128,76 +145,204 @@ export default function TradeForm({ onTradeAdded }) {
     return (
         <div className="card">
             <h3>매매 기록 추가</h3>
-            <form onSubmit={handleSubmit} style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
-                <div style={{ flex: '0 0 140px' }}>
-                    <label className="text-sm text-muted">날짜</label>
-                    <input type="date" name="date" value={formData.date} onChange={handleChange} className="input" required style={{ width: '100%' }} />
-                </div>
-                <div style={{ flex: '0 0 130px' }}>
-                    <label className="text-sm text-muted">계좌</label>
-                    <select name="account" value={formData.account} onChange={handleChange} className="input" style={{ width: '100%' }}>
-                        <option value="General">일반</option>
-                        <option value="Pension">연금저축</option>
-                        <option value="IRP">IRP</option>
-                    </select>
-                </div>
-                <div style={{ flex: '0 0 80px' }}>
-                    <label className="text-sm text-muted">구분</label>
-                    <select name="type" value={formData.type} onChange={handleChange} className="input" style={{ width: '100%' }}>
-                        <option value="Buy">매수</option>
-                        <option value="Sell">매도</option>
-                    </select>
-                </div>
-                <div style={{ flex: '0 0 120px' }}>
-                    <label className="text-sm text-muted">자산군</label>
-                    <select name="assetClass" value={formData.assetClass} onChange={handleChange} className="input" style={{ width: '100%' }}>
-                        <option value="Domestic Stock">국내 주식</option>
-                        <option value="US Stock">미국 주식</option>
-                        <option value="Crypto">암호화폐</option>
-                    </select>
-                </div>
-                <div style={{ flex: '0 0 140px' }}>
-                    <label className="text-sm text-muted">티커</label>
-                    <div style={{ position: 'relative' }}>
+            <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>
+                {/* Row 1: Basic Inputs */}
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '150px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>날짜</label>
                         <input
-                            type="text"
-                            name="ticker"
-                            value={formData.ticker}
+                            type="date"
+                            name="date"
+                            value={formData.date}
                             onChange={handleChange}
-                            onBlur={handleTickerBlur}
-                            placeholder="예: 005930.KS"
-                            className="input"
-                            required
-                            style={{ width: '100%' }}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
                         />
-                        {!fetchingName && stockName && <div className="text-xs text-success" style={{ position: 'absolute', top: '100%', left: 0 }}>{stockName}</div>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: '100px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>계좌</label>
+                        <select
+                            name="account"
+                            value={formData.account}
+                            onChange={handleChange}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
+                        >
+                            <option value="일반">일반</option>
+                            <option value="연금">연금</option>
+                            <option value="ISA">ISA</option>
+                        </select>
+                    </div>
+                    <div style={{ flex: 1, minWidth: '100px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>구분</label>
+                        <select
+                            name="type"
+                            value={formData.type}
+                            onChange={handleChange}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
+                        >
+                            <option value="매수">매수</option>
+                            <option value="매도">매도</option>
+                            <option value="배당">배당</option>
+                        </select>
+                    </div>
+                    <div style={{ flex: 1, minWidth: '100px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>자산군</label>
+                        <select
+                            name="category" // Changed from assetClass
+                            value={formData.category} // Changed to category
+                            onChange={handleChange}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
+                        >
+                            <option value="국내 주식">국내 주식</option>
+                            <option value="해외 주식">해외 주식</option>
+                            <option value="암호화폐">암호화폐</option>
+                            <option value="현금">현금</option>
+                        </select>
+                    </div>
+                    <div style={{ flex: 2, minWidth: '200px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>티커</label>
+                        <StockAutocomplete
+                            value={formData.ticker}
+                            onChange={(val) => {
+                                setFormData(prev => ({ ...prev, ticker: val }));
+                                if (val) {
+                                    setTimeout(() => handleTickerBlur(), 100);
+                                }
+                            }}
+                            onSelect={(stock) => {
+                                setFormData(prev => ({ ...prev, ticker: stock.ticker }));
+                                setStockName(stock.name);
+                            }}
+                            placeholder="종목형/코드"
+                            useApi={true}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
+                        />
+                        {!fetchingName && stockName && <div className="text-xs text-success" style={{ position: 'absolute', top: '100%', left: 0, marginTop: '2px', whiteSpace: 'nowrap' }}>{stockName}</div>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: '120px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>가격</label>
+                        <input
+                            type="number"
+                            name="price"
+                            value={formData.price}
+                            onChange={handleChange}
+                            placeholder="매수가"
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
+                        />
+                    </div>
+                    <div style={{ flex: 1, minWidth: '100px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>수량</label>
+                        <input
+                            type="number"
+                            name="quantity"
+                            value={formData.quantity}
+                            onChange={handleChange}
+                            placeholder="수량"
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
+                        />
+                    </div>
+                    <div style={{ flex: 1, minWidth: '100px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>수수료</label>
+                        <input
+                            type="number"
+                            name="fee"
+                            value={formData.fee}
+                            onChange={handleChange}
+                            placeholder="0"
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white'
+                            }}
+                        />
                     </div>
                 </div>
-                <div style={{ flex: '1 1 150px' }}>
-                    <label className="text-sm text-muted">가격</label>
-                    <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="매수가" className="input" step="any" required style={{ width: '100%' }} />
-                </div>
-                <div style={{ flex: '0 0 100px' }}>
-                    <label className="text-sm text-muted">수량</label>
-                    <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} placeholder="수량" className="input" step="any" required style={{ width: '100%' }} />
-                </div>
-                <div style={{ flex: '0 0 100px' }}>
-                    <label className="text-sm text-muted">수수료</label>
-                    <input type="number" name="fee" value={formData.fee} onChange={handleChange} placeholder="0" className="input" step="any" style={{ width: '100%' }} />
-                </div>
-                <div style={{ flex: '1 1 100%' }}>
-                    <label className="text-sm text-muted">매매 사유 / 메모</label>
-                    <textarea
-                        name="reason"
-                        value={formData.reason || ''}
-                        onChange={handleChange}
-                        placeholder="매수/매도 이유를 기록하세요..."
-                        className="input"
-                        style={{ minHeight: '60px', resize: 'vertical', width: '100%' }}
-                    />
-                </div>
-                <div style={{ flex: '1 1 100%', display: 'flex', justifyContent: 'center' }}>
-                    <button type="submit" className="btn btn-primary" style={{ width: 'auto', paddingLeft: '3rem', paddingRight: '3rem' }}>기록하기</button>
+
+                {/* Row 2: Reason & Action */}
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'stretch' }}>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>매매 사유 / 메모</label>
+                        <textarea
+                            name="reason"
+                            value={formData.reason || ''}
+                            onChange={handleChange}
+                            placeholder="매수/매도 이유를 기록하세요"
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                background: '#1d1d1d',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: 'white',
+                                height: '50px',
+                                resize: 'none'
+                            }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            style={{
+                                height: '50px',
+                                padding: '0 2rem',
+                                marginBottom: '4px' // Align with textarea input part roughly
+                            }}
+                        >
+                            기록하기
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

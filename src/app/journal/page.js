@@ -1,156 +1,113 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Newspaper, Bot, ExternalLink } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import { ArrowLeft, Trash2, Calendar, FileText } from 'lucide-react';
 
-export default function JournalPage() {
-    const [news, setNews] = useState([]);
-    const [analysis, setAnalysis] = useState(null);
+export default function JournalHistoryPage() {
+    const [journals, setJournals] = useState([]);
+    const [selectedJournal, setSelectedJournal] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [analyzing, setAnalyzing] = useState(false);
 
     useEffect(() => {
-        fetchNews();
+        fetchJournals();
     }, []);
 
-    const fetchNews = async () => {
+    const fetchJournals = async () => {
         try {
-            const res = await fetch('/api/journal', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ analyze: false })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setNews(data.news);
+            const res = await fetch('/api/journal');
+            const data = await res.json();
+            if (data.journals) {
+                setJournals(data.journals);
             }
         } catch (error) {
-            console.error('Failed to fetch news', error);
+            console.error('Failed to fetch journals', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const generateInsight = async () => {
-        setAnalyzing(true);
-        try {
-            const res = await fetch('/api/journal', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ analyze: true })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setAnalysis(data.analysis);
-            }
-        } catch (error) {
-            console.error('Failed to generate insight', error);
-        } finally {
-            setAnalyzing(false);
-        }
-    };
+    // Note: Delete API is not implemented yet in route.js, so this is just UI for now or we can implement DELETE method.
+    // For now let's just show the list.
 
     return (
-        <div className="container" style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '2rem' }}>
-                <Link href="/" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                    <ArrowLeft size={16} /> Back to Dashboard
+        <div className="container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h1 style={{ fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', margin: '0 0 0.5rem 0' }}>
+                        <FileText size={32} /> 투자 일지 기록 (History)
+                    </h1>
+                    <p style={{ color: 'var(--text-muted)', margin: 0 }}>
+                        저장된 과거의 AI 투자 분석 기록을 확인하세요.
+                    </p>
+                </div>
+                <Link href="/" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                    메인으로
                 </Link>
-                <h1 style={{ fontSize: '2.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <Newspaper size={40} /> Hyper-Personalized Journal
-                </h1>
-                <p style={{ color: 'var(--text-muted)' }}>
-                    Curated news and AI insights for your specific portfolio holdings.
-                </p>
             </div>
 
-            {/* AI Insight Section */}
-            <div className="card" style={{ marginBottom: '2rem', border: '1px solid var(--primary)', background: 'rgba(59, 130, 246, 0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Bot size={24} /> AI Portfolio Insight
+            <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', alignItems: 'start' }}>
+                {/* Sidebar: List */}
+                <div className="card" style={{ padding: '1rem', height: 'calc(100vh - 200px)', overflowY: 'auto' }}>
+                    <h3 style={{ marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                        저장된 일지 ({journals.length})
                     </h3>
-                    <button
-                        onClick={generateInsight}
-                        disabled={analyzing}
-                        className="btn btn-primary"
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                    >
-                        {analyzing ? 'Analyzing...' : '✨ Generate Insight'}
-                    </button>
-                </div>
-
-                {analysis ? (
-                    <div>
-                        <div style={{ fontSize: '1.1rem', marginBottom: '1rem', lineHeight: '1.6' }}>
-                            {analysis.summary}
+                    {loading ? (
+                        <div>Loading...</div>
+                    ) : journals.length === 0 ? (
+                        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 0' }}>
+                            기록이 없습니다.
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                            <div className="badge" style={{ background: 'var(--surface)' }}>
-                                Sentiment: <b>{analysis.sentiment}</b>
-                            </div>
-                            {analysis.impactedAssets.map(ticker => (
-                                <div key={ticker} className="badge" style={{ background: 'var(--surface)' }}>
-                                    {ticker}
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {journals.map((journal, index) => (
+                                <div
+                                    key={journal.id || index}
+                                    onClick={() => setSelectedJournal(journal)}
+                                    style={{
+                                        padding: '1rem',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        background: selectedJournal?.id === journal.id ? 'var(--primary)' : 'var(--background-secondary)',
+                                        color: selectedJournal?.id === journal.id ? 'white' : 'inherit',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
+                                        <Calendar size={14} />
+                                        {journal.date}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', opacity: 0.8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {journal.content.substring(0, 30)}...
+                                    </div>
                                 </div>
                             ))}
                         </div>
-                        {analysis.actionableInsights && (
-                            <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--surface)', borderRadius: '8px' }}>
-                                <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Actionable Insights</div>
-                                <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
-                                    {analysis.actionableInsights.map((insight, idx) => (
-                                        <li key={idx} style={{ marginBottom: '0.25rem' }}>{insight}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                        Click "Generate Insight" to analyze recent news impact on your portfolio.
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
 
-            {/* News Feed */}
-            <h3 style={{ marginBottom: '1rem' }}>Latest News</h3>
-            {loading ? (
-                <div>Loading news...</div>
-            ) : (
-                <div style={{ display: 'grid', gap: '1rem' }}>
-                    {news.map((item, idx) => (
-                        <div key={idx} className="card" style={{ display: 'flex', gap: '1rem', transition: 'transform 0.2s' }}>
-                            {item.thumbnail && (
-                                <img
-                                    src={item.thumbnail}
-                                    alt={item.title}
-                                    style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
-                                />
-                            )}
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                    <span className="badge" style={{ fontSize: '0.8rem' }}>{item.ticker}</span>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                        {new Date(item.providerPublishTime).toLocaleDateString()}
-                                    </span>
-                                </div>
-                                <a
-                                    href={item.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--foreground)', textDecoration: 'none', display: 'block', marginBottom: '0.5rem' }}
-                                >
-                                    {item.title} <ExternalLink size={14} style={{ display: 'inline', marginLeft: '4px' }} />
-                                </a>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                                    {item.publisher}
-                                </div>
+                {/* Main Content: Viewer */}
+                <div className="card" style={{ padding: '2rem', minHeight: '500px' }}>
+                    {selectedJournal ? (
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+                                <h2 style={{ margin: 0 }}>{selectedJournal.date} 투자 일지</h2>
+                                <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                                    Updated: {new Date(selectedJournal.updatedAt).toLocaleString()}
+                                </span>
+                            </div>
+                            <div className="prose" style={{ color: 'var(--foreground)' }}>
+                                <ReactMarkdown>{selectedJournal.content}</ReactMarkdown>
                             </div>
                         </div>
-                    ))}
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', minHeight: '400px' }}>
+                            <FileText size={64} style={{ marginBottom: '1rem', opacity: 0.2 }} />
+                            <p style={{ fontSize: '1.2rem' }}>왼쪽 목록에서 일지를 선택하여 내용을 확인하세요.</p>
+                        </div>
+                    )}
                 </div>
-            )}
-        </div>
+            </div>
+        </div >
     );
 }

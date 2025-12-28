@@ -1,114 +1,12 @@
-
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SummaryCards from '@/components/Dashboard/SummaryCards';
-import AllocationChart from '@/components/Dashboard/AllocationChart';
-import HistoryChart from '@/components/Dashboard/HistoryChart';
-import PerformanceStats from '@/components/Dashboard/PerformanceStats';
 import JournalSection from '@/components/Dashboard/JournalSection';
+import RoastSection from '@/components/Dashboard/RoastSection';
 import MarketIndices from '@/components/Dashboard/MarketIndices';
-import TradeForm from '@/components/Trade/TradeForm';
-import TradeList from '@/components/Trade/TradeList';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
-
-function ValueAlerts() {
-    const [alerts, setAlerts] = useState({ overheated: [], undervalued: [], neutral: [] });
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch('/api/value-alerts')
-            .then(res => res.json())
-            .then(data => {
-                if (!data.error) setAlerts(data);
-                setLoading(false);
-            })
-            .catch(err => setLoading(false));
-    }, []);
-
-    if (loading) return null;
-    if (alerts.overheated.length === 0 && alerts.undervalued.length === 0 && alerts.neutral.length === 0 && alerts.pending.length === 0) return null;
-
-    return (
-        <div className="card">
-            <h3>⚠️ Value Alerts</h3>
-            <div className="grid-2" style={{ gap: '1.5rem' }}>
-                {alerts.overheated.length > 0 && (
-                    <div>
-                        <h4 className="text-danger" style={{ marginBottom: '0.5rem' }}>🔴 Overheated</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            {alerts.overheated.map(item => (
-                                <Link key={item.ticker} href={`/analysis/${item.ticker}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                    <div style={{ padding: '0.5rem', background: 'var(--surface-hover)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="hover-card">
-                                        <div>
-                                            <b>{item.name || item.ticker}</b>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.ticker} • Margin: {item.marginOfSafety}%</div>
-                                        </div>
-                                        <div className="badge" style={{ background: 'var(--danger)', color: 'white', fontSize: '0.8rem' }}>{item.recommendation}</div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                {alerts.undervalued.length > 0 && (
-                    <div>
-                        <h4 className="text-success" style={{ marginBottom: '0.5rem' }}>🟢 Undervalued</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            {alerts.undervalued.map(item => (
-                                <Link key={item.ticker} href={`/analysis/${item.ticker}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                    <div style={{ padding: '0.5rem', background: 'var(--surface-hover)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="hover-card">
-                                        <div>
-                                            <b>{item.name || item.ticker}</b>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.ticker} • Margin: +{item.marginOfSafety}%</div>
-                                        </div>
-                                        <div className="badge" style={{ background: 'var(--success)', color: 'white', fontSize: '0.8rem' }}>{item.recommendation}</div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                {alerts.neutral.length > 0 && (
-                    <div>
-                        <h4 style={{ marginBottom: '0.5rem', color: 'var(--warning)' }}>🟡 Fair Value / Hold</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            {alerts.neutral.map(item => (
-                                <Link key={item.ticker} href={`/analysis/${item.ticker}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                    <div style={{ padding: '0.5rem', background: 'var(--surface-hover)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="hover-card">
-                                        <div>
-                                            <b>{item.name || item.ticker}</b>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.ticker} • Margin: {item.marginOfSafety > 0 ? '+' : ''}{item.marginOfSafety}%</div>
-                                        </div>
-                                        <div className="badge" style={{ background: 'var(--warning)', color: 'white', fontSize: '0.8rem' }}>{item.recommendation}</div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                {alerts.pending && alerts.pending.length > 0 && (
-                    <div style={{ gridColumn: '1 / -1', marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-                        <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-muted)' }}>⏳ Pending Analysis</h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem' }}>
-                            {alerts.pending.map(item => (
-                                <Link key={item.ticker} href={`/analysis/${item.ticker}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                    <div style={{ padding: '0.5rem', background: 'var(--surface-hover)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="hover-card">
-                                        <div>
-                                            <b>{item.name || item.ticker}</b>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.ticker}</div>
-                                        </div>
-                                        <div className="badge" style={{ background: 'var(--text-muted)', color: 'white', fontSize: '0.8rem' }}>ANALYZE</div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
+import Login from '@/components/Auth/Login';
 
 export default function Home() {
     const [trades, setTrades] = useState([]);
@@ -120,7 +18,7 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [exchangeRate, setExchangeRate] = useState(null);
 
-    // 1. Fetch Trades, History, Assets, Liabilities
+    // 1. Fetch All Data
     const fetchAllData = async () => {
         try {
             const [resTrades, resHistory, resAssets, resLiabilities] = await Promise.all([
@@ -143,7 +41,7 @@ export default function Home() {
         fetchAllData();
     }, []);
 
-    // 2. Fetch Prices when trades change
+    // 2. Fetch Prices
     useEffect(() => {
         const fetchPrices = async () => {
             if (trades.length === 0) {
@@ -152,8 +50,7 @@ export default function Home() {
             }
 
             const tickers = [...new Set(trades.map(t => t.ticker))];
-            // Always fetch exchange rate
-            const allTickers = [...tickers, 'KRW=X'];
+            const allTickers = [...tickers, 'KRW=X']; // USD/KRW
 
             try {
                 const res = await fetch(`/api/prices?tickers=${allTickers.join(',')}`);
@@ -184,10 +81,9 @@ export default function Home() {
             const totalAssets = computedStats.totalValue + manualAssetsValue;
             const netWorth = totalAssets - liabilitiesValue;
 
-            // Auto-save history if totalValue > 0
+            // Auto-save history
             if (computedStats.totalValue > 0) {
                 const today = new Date().toLocaleDateString('en-CA');
-
                 fetch('/api/history', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -208,40 +104,14 @@ export default function Home() {
         }
     }, [trades, prices, loading, exchangeRate, manualAssets, liabilities]);
 
-    const handleTradeAdded = (newTrade) => {
-        setTrades(prev => [...prev, newTrade]);
-    };
-
-    const handleTradeDeleted = async (tradeId) => {
-        if (!confirm('정말 삭제하시겠습니까?')) return;
-
-        try {
-            const res = await fetch(`/api/trades?id=${tradeId}`, { method: 'DELETE' });
-            if (res.ok) {
-                setTrades(prev => prev.filter(t => t.id !== tradeId));
-            } else {
-                alert('삭제 실패');
-            }
-        } catch (error) {
-            console.error('Failed to delete trade', error);
-            alert('삭제 중 오류 발생');
-        }
-    };
-
-    const handleTradeUpdated = async () => {
-        await fetchAllData();
-    };
-
-    // Calculate Net Worth
+    // Net Worth Calculation for UI
     const realEstateValue = manualAssets.filter(a => a.category === 'Real Estate').reduce((sum, item) => sum + parseFloat(item.value), 0);
     const cashValue = manualAssets.filter(a => a.category !== 'Real Estate').reduce((sum, item) => sum + parseFloat(item.value), 0);
     const manualAssetsValue = realEstateValue + cashValue;
-
     const liabilitiesValue = liabilities.reduce((sum, item) => sum + parseFloat(item.amount), 0);
     const totalAssets = stats.totalValue + manualAssetsValue;
     const netWorth = totalAssets - liabilitiesValue;
     const leverageRatio = totalAssets > 0 ? (liabilitiesValue / totalAssets) * 100 : 0;
-
     const formatCurrency = (val) => new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(val);
 
     return (
@@ -251,30 +121,34 @@ export default function Home() {
                     <h1>My Portfolio</h1>
                     <p>Investment Dashboard & Journal</p>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <Login />
+                    <Link href="/portfolio" className="btn btn-outline" style={{ borderColor: '#eab308', color: '#eab308' }}>
+                        포트폴리오
+                    </Link>
+                    <Link href="/analysis" className="btn btn-outline" style={{ borderColor: '#10b981', color: '#10b981' }}>
+                        분석
+                    </Link>
                     <Link href="/networth" className="btn btn-outline" style={{ borderColor: '#3b82f6', color: '#3b82f6' }}>
-                        💰 자산/부채 관리
+                        자산/부채
                     </Link>
                     <Link href="/journal" className="btn btn-outline" style={{ borderColor: '#8b5cf6', color: '#8b5cf6' }}>
-                        📰 AI Journal
+                        일지 기록
                     </Link>
                     <Link href="/rebalancing" className="btn btn-outline">
-                        ⚖️ 리밸런싱
+                        리밸런싱
                     </Link>
                     <Link href="/simulator" className="btn btn-outline" style={{ borderColor: '#f87171', color: '#f87171' }}>
-                        🌪️ Risk Sim
+                        Risk Sim
                     </Link>
-                    <div className="text-sm text-muted">
-                        {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
-                    </div>
                 </div>
             </header>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                {/* Net Worth Summary Card */}
+                {/* 1. Net Worth Summary */}
                 <div className="card" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', border: '1px solid #334155' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <h2 style={{ fontSize: '1.25rem', margin: 0 }}>💎 순자산 (Net Worth)</h2>
+                        <h2 style={{ fontSize: '1.25rem', margin: 0 }}>순자산 (Net Worth)</h2>
                         <span className="text-xl font-bold text-success">{formatCurrency(netWorth)}</span>
                     </div>
                     <div className="grid-5" style={{ gap: '1rem' }}>
@@ -301,34 +175,23 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Value Alerts Section */}
-                <ValueAlerts />
-
-                {/* Row 1: Summary & Chart */}
-                <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '1.5rem', alignItems: 'start' }}>
+                {/* 2. Key Metrics & Market Indices */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
                     <SummaryCards stats={stats} />
-                    <AllocationChart assets={stats.assets} />
+                    <MarketIndices />
                 </div>
 
-                <HistoryChart history={history} />
-                <PerformanceStats history={history} />
-
-                {/* Row 2: Journal Section */}
-                <JournalSection stats={stats} trades={trades} history={history} />
-
-                {/* Row 3: Market Indices */}
-                <MarketIndices />
-
-                {/* Row 4: Trade Form */}
-                <TradeForm onTradeAdded={handleTradeAdded} />
-
-                {/* Row 5: Trade List */}
-                <TradeList
+                {/* 3. Engagement (Roast & Journal) */}
+                <RoastSection stats={stats} holdings={trades} />
+                <JournalSection
+                    stats={stats}
                     trades={trades}
-                    prices={prices}
-                    exchangeRate={exchangeRate}
-                    onTradeDeleted={handleTradeDeleted}
-                    onTradeUpdated={handleTradeUpdated}
+                    history={history}
+                    globalStats={{
+                        netWorth,
+                        totalAssets,
+                        liabilities: liabilitiesValue
+                    }}
                 />
             </div>
         </div>

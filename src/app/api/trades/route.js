@@ -1,26 +1,29 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { db, verifyAuth } from '@/lib/firebaseAdmin';
+import { appendTradeToSheet } from '@/lib/googleSheets';
 
-const dataFilePath = path.join(process.cwd(), 'data', 'trades.json');
+const COLLECTION_NAME = 'trades';
 
 export async function GET() {
+  // GET is public (read-only)
   try {
-    const fileContent = await fs.readFile(dataFilePath, 'utf8');
-    const trades = JSON.parse(fileContent);
+    const snapshot = await db.collection(COLLECTION_NAME).orderBy('createdAt', 'desc').get();
+    const trades = snapshot.docs.map(doc => doc.data());
     return Response.json(trades);
   } catch (error) {
-    return Response.json({ error: 'Failed to read trades' }, { status: 500 });
+    console.error('Failed to fetch trades from Firestore:', error);
+    return Response.json({ error: 'Failed to fetch trades' }, { status: 500 });
   }
 }
 
-import { appendTradeToSheet } from '@/lib/googleSheets';
-
 export async function POST(request) {
+  const auth = await verifyAuth(request);
+  if (!auth) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const trade = await request.json();
-    const fileContent = await fs.readFile(dataFilePath, 'utf8');
-    const trades = JSON.parse(fileContent);
 
     const newTrade = {
       id: uuidv4(),
@@ -28,20 +31,25 @@ export async function POST(request) {
       ...trade, // date, type, assetClass, ticker, price, quantity
     };
 
-    trades.push(newTrade);
+    // Save to Firestore
+    await db.collection(COLLECTION_NAME).doc(newTrade.id).set(newTrade);
 
-    await fs.writeFile(dataFilePath, JSON.stringify(trades, null, 2));
-
-    // Append to Google Sheet (fire and forget, don't block response)
+    // Append to Google Sheet (fire and forget)
     appendTradeToSheet(newTrade).catch(err => console.error('Sheet upload failed:', err));
 
     return Response.json(newTrade);
   } catch (error) {
+    console.error('Failed to save trade:', error);
     return Response.json({ error: 'Failed to save trade' }, { status: 500 });
   }
 }
 
 export async function DELETE(request) {
+  const auth = await verifyAuth(request);
+  if (!auth) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -50,25 +58,21 @@ export async function DELETE(request) {
       return Response.json({ error: 'Trade ID is required' }, { status: 400 });
     }
 
-    const fileContent = await fs.readFile(dataFilePath, 'utf8');
-    let trades = JSON.parse(fileContent);
-
-    const initialLength = trades.length;
-    trades = trades.filter(trade => trade.id !== id);
-
-    if (trades.length === initialLength) {
-      return Response.json({ error: 'Trade not found' }, { status: 404 });
-    }
-
-    await fs.writeFile(dataFilePath, JSON.stringify(trades, null, 2));
+    await db.collection(COLLECTION_NAME).doc(id).delete();
 
     return Response.json({ success: true });
   } catch (error) {
+    console.error('Failed to delete trade:', error);
     return Response.json({ error: 'Failed to delete trade' }, { status: 500 });
   }
 }
 
 export async function PUT(request) {
+  const auth = await verifyAuth(request);
+  if (!auth) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const updateData = await request.json();
     const { id, ...updates } = updateData;
@@ -77,21 +81,15 @@ export async function PUT(request) {
       return Response.json({ error: 'Trade ID is required' }, { status: 400 });
     }
 
-    const fileContent = await fs.readFile(dataFilePath, 'utf8');
-    let trades = JSON.parse(fileContent);
+    const docRef = db.collection(COLLECTION_NAME).doc(id);
+    await docRef.update(updates);
 
-    const tradeIndex = trades.findIndex(t => t.id === id);
-    if (tradeIndex === -1) {
-      return Response.json({ error: 'Trade not found' }, { status: 404 });
-    }
+    // Fetch updated doc to return
+    const updatedDoc = await docRef.get();
 
-    // Update fields
-    trades[tradeIndex] = { ...trades[tradeIndex], ...updates };
-
-    await fs.writeFile(dataFilePath, JSON.stringify(trades, null, 2));
-
-    return Response.json(trades[tradeIndex]);
+    return Response.json(updatedDoc.data());
   } catch (error) {
+    console.error('Failed to update trade:', error);
     return Response.json({ error: 'Failed to update trade' }, { status: 500 });
   }
 }

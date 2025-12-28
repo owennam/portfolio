@@ -1,57 +1,66 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { fetchPortfolioNews } from '@/lib/journal/newsFetcher';
-import { analyzeNews } from '@/lib/journal/llmAnalyzer';
+import { db, verifyAuth } from '@/lib/firebaseAdmin';
 
-const TRADES_FILE = path.join(process.cwd(), 'data', 'trades.json');
+const COLLECTION_NAME = 'journals';
 
 export async function POST(request) {
+    const auth = await verifyAuth(request);
+    if (!auth) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
-        console.log('Journal API called');
-
-        // 1. Get Tickers from Portfolio
-        console.log('Reading trades file:', TRADES_FILE);
-        if (!fs.existsSync(TRADES_FILE)) {
-            console.error('Trades file not found');
-            return NextResponse.json({ news: [], analysis: null });
-        }
-
-        const fileData = fs.readFileSync(TRADES_FILE, 'utf8');
-        const trades = JSON.parse(fileData);
-
-        // Extract unique tickers
-        const tickers = [...new Set(trades.map(t => t.ticker))];
-        console.log('Tickers found:', tickers);
-
-        if (tickers.length === 0) {
-            return NextResponse.json({ news: [], analysis: null });
-        }
-
-        // 2. Fetch News
-        console.log('Fetching news...');
-        const news = await fetchPortfolioNews(tickers);
-        console.log('News fetched count:', news ? news.length : 'null');
-
-        // 3. Analyze (Optional: only if requested)
         const body = await request.json();
-        const analyze = body.analyze;
-        let analysis = null;
+        const { date, content } = body;
 
-        if (analyze) {
-            console.log('Analyzing news...');
-            analysis = await analyzeNews(news, { tickerCount: tickers.length });
-            console.log('Analysis complete');
+        if (!date || !content) {
+            return NextResponse.json({ error: 'Date and content are required' }, { status: 400 });
         }
 
-        return NextResponse.json({
-            success: true,
-            news,
-            analysis
-        });
+        // Check if entry for date exists
+        const snapshot = await db.collection(COLLECTION_NAME).where('date', '==', date).limit(1).get();
+
+        let docRef;
+        let newEntry;
+
+        if (!snapshot.empty) {
+            // Update existing
+            const doc = snapshot.docs[0];
+            docRef = doc.ref;
+            newEntry = {
+                ...doc.data(),
+                content,
+                updatedAt: new Date().toISOString()
+            };
+            await docRef.update(newEntry);
+        } else {
+            // Create new
+            const id = Date.now().toString();
+            newEntry = {
+                id,
+                date,
+                content,
+                updatedAt: new Date().toISOString()
+            };
+            await db.collection(COLLECTION_NAME).doc(id).set(newEntry);
+        }
+
+        return NextResponse.json({ success: true, journal: newEntry });
 
     } catch (error) {
-        console.error('Journal API Error:', error);
-        return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+        console.error('Failed to save journal:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+export async function GET(request) {
+    try {
+        const snapshot = await db.collection(COLLECTION_NAME).orderBy('date', 'desc').get();
+        const journals = snapshot.docs.map(doc => doc.data());
+
+        return NextResponse.json({ journals });
+    } catch (error) {
+        console.error('Failed to fetch journals:', error);
+        return NextResponse.json({ error: 'Failed to fetch journals' }, { status: 500 });
     }
 }

@@ -11,8 +11,16 @@ export default function AllocationChart({ assets }) {
         return acc;
     }, {});
 
+    const totalValue = Object.values(allocation).reduce((sum, val) => sum + val, 0);
+
+    const labels = Object.keys(allocation).map(key => {
+        const value = allocation[key];
+        const percentage = totalValue > 0 ? ((value / totalValue) * 100).toFixed(1) : 0;
+        return `${key} ${percentage}%`;
+    });
+
     const data = {
-        labels: Object.keys(allocation),
+        labels,
         datasets: [
             {
                 data: Object.values(allocation),
@@ -32,15 +40,20 @@ export default function AllocationChart({ assets }) {
     const options = {
         plugins: {
             legend: {
-                position: 'right',
-                labels: { color: '#ededed' }
+                position: 'bottom',
+                labels: {
+                    color: '#ededed',
+                    padding: 20,
+                    usePointStyle: true,
+                }
             }
         },
-        cutout: '70%',
+        cutout: '60%',
+        maintainAspectRatio: false,
     };
 
     return (
-        <div className="card" style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="card" style={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
             <div style={{ width: '100%', height: '100%' }}>
                 <Doughnut data={data} options={options} />
             </div>

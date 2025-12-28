@@ -1,5 +1,6 @@
 export function normalizeTicker(ticker) {
     if (!ticker) return ticker;
+    // Strip .KS, .KQ but KEEP -USD (BTC != BTC-USD)
     return ticker.toUpperCase().replace(/\.(KS|KQ)$/, '');
 }
 

@@ -114,12 +114,12 @@ export default function SimulatorPage() {
 
     return (
         <div className="container">
-            <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link href="/" style={{ textDecoration: 'none', fontSize: '1.5rem' }}>←</Link>
+            <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h1 style={{ margin: 0 }}>🌪️ Risk Scenario Simulator</h1>
+                    <h1 style={{ margin: 0 }}>Risk Scenario Simulator</h1>
                     <p style={{ margin: 0, color: '#888' }}>Stress test your portfolio against market volatility</p>
                 </div>
+                <Link href="/" className="btn btn-outline">메인으로</Link>
             </header>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>

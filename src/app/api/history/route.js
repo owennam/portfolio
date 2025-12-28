@@ -1,49 +1,33 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { db, verifyAuth } from '@/lib/firebaseAdmin';
 
-const dataDir = path.join(process.cwd(), 'data');
-const historyFile = path.join(dataDir, 'history.json');
-
-async function ensureDataDir() {
-    try {
-        await fs.access(dataDir);
-    } catch {
-        await fs.mkdir(dataDir, { recursive: true });
-    }
-}
-
-async function getHistory() {
-    await ensureDataDir();
-    try {
-        const data = await fs.readFile(historyFile, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
-
-async function saveHistory(history) {
-    await ensureDataDir();
-    await fs.writeFile(historyFile, JSON.stringify(history, null, 2));
-}
+const COLLECTION_NAME = 'history';
 
 export async function GET() {
-    const history = await getHistory();
-    return Response.json(history);
+    try {
+        const snapshot = await db.collection(COLLECTION_NAME).orderBy('date', 'asc').get();
+        const history = snapshot.docs.map(doc => doc.data());
+        return Response.json(history);
+    } catch (error) {
+        console.error('Failed to fetch history:', error);
+        return Response.json([]);
+    }
 }
 
 export async function POST(request) {
+    const auth = await verifyAuth(request);
+    if (!auth) {
+        // Warning: Local auto-save uses this endpoint blindly.
+        // For now, allow unauthenticated history save IF it is from localhost/server context?
+        // Actually, history is auto-saved by client useEffect. We need client token there too.
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         const { date, totalValue, investedAmount, netWorth, totalAssets, liabilities } = await request.json();
 
         if (!date || totalValue === undefined) {
             return Response.json({ error: 'Missing required fields' }, { status: 400 });
         }
-
-        const history = await getHistory();
-
-        // Check if entry for this date already exists
-        const existingIndex = history.findIndex(h => h.date === date);
 
         const newEntry = {
             date,
@@ -54,18 +38,12 @@ export async function POST(request) {
             liabilities: liabilities || 0
         };
 
-        if (existingIndex >= 0) {
-            // Update existing entry
-            history[existingIndex] = { ...history[existingIndex], ...newEntry };
-        } else {
-            // Add new entry
-            history.push(newEntry);
-        }
+        // Use date as Document ID for easy upsert and uniqueness
+        await db.collection(COLLECTION_NAME).doc(date).set(newEntry, { merge: true });
 
-        // Sort by date
-        history.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        await saveHistory(history);
+        // Retrieve full sorted history to return (legacy behavior expected by frontend)
+        const snapshot = await db.collection(COLLECTION_NAME).orderBy('date', 'asc').get();
+        const history = snapshot.docs.map(doc => doc.data());
 
         return Response.json({ success: true, history });
     } catch (error) {

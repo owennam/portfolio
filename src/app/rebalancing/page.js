@@ -269,9 +269,9 @@ export default function RebalancingPage() {
 
     return (
         <div className="container">
-            <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link href="/" style={{ textDecoration: 'none', fontSize: '1.5rem' }}>←</Link>
+            <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1>포트폴리오 리밸런싱</h1>
+                <Link href="/" className="btn btn-outline">메인으로</Link>
             </header>
 
             <div className="card">

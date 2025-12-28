@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useAuth } from '@/contexts/AuthContext';
 
-export default function JournalSection({ stats, trades, history }) {
+export default function JournalSection({ stats, trades, history, globalStats }) {
     const [journal, setJournal] = useState('');
     const [loading, setLoading] = useState(false);
     const [mode, setMode] = useState('preview');
@@ -14,6 +15,11 @@ export default function JournalSection({ stats, trades, history }) {
     };
 
     const handleGenerate = async () => {
+        // Validation: Warn if data seems missing but allow proceed (might be fresh user)
+        if (!stats.totalValue && !globalStats?.totalAssets) {
+            console.warn('Generating journal with 0 assets.');
+        }
+
         setLoading(true);
         try {
             const sortedTrades = [...trades].sort((a, b) => (b.price * b.quantity) - (a.price * a.quantity));
@@ -29,6 +35,7 @@ export default function JournalSection({ stats, trades, history }) {
                         netProfit: stats.netProfit,
                         roi: stats.roi
                     },
+                    globalStats,
                     trades: trades,
                     history: history
                 })
@@ -37,14 +44,19 @@ export default function JournalSection({ stats, trades, history }) {
             if (data.markdown) {
                 setJournal(data.markdown);
                 setMode('preview');
+            } else if (data.error) {
+                throw new Error(data.details || data.error);
             }
         } catch (error) {
             console.error('Failed to generate journal', error);
-            showToast('일지 생성 실패', 'error');
+            showToast(`일지 생성 실패: ${error.message}`, 'error');
         } finally {
             setLoading(false);
         }
     };
+
+
+    const { user } = useAuth();
 
     const handleSave = async () => {
         console.log('handleSave called');
@@ -53,13 +65,22 @@ export default function JournalSection({ stats, trades, history }) {
             return;
         }
 
+        if (!user) {
+            showToast('로그인이 필요합니다', 'error');
+            return;
+        }
+
         try {
             const today = new Date().toLocaleDateString('en-CA');
             console.log('Saving journal for date:', today);
 
+            const token = await user.getIdToken();
             const res = await fetch('/api/journal', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     date: today,
                     content: journal
@@ -73,8 +94,13 @@ export default function JournalSection({ stats, trades, history }) {
                 showToast('✅ 투자 일지가 저장되었습니다!', 'success');
             } else {
                 const errorText = await res.text();
-                console.error('Save failed:', res.status, errorText);
-                showToast('저장 실패', 'error');
+                // Check if 401
+                if (res.status === 401) {
+                    showToast('권한이 없습니다 (로그인 필요)', 'error');
+                } else {
+                    console.error('Save failed:', res.status, errorText);
+                    showToast('저장 실패', 'error');
+                }
             }
         } catch (error) {
             console.error('Failed to save journal', error);
@@ -109,18 +135,18 @@ export default function JournalSection({ stats, trades, history }) {
             )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 style={{ margin: 0 }}>🤖 AI 투자 일지</h2>
+                <h2 style={{ margin: 0 }}>AI 투자 일지</h2>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     {journal && (
                         <>
-                            <button className="btn btn-outline" onClick={handleSave}>💾 저장</button>
+                            <button className="btn btn-outline" onClick={handleSave}>저장</button>
                             <button
                                 className="btn btn-outline"
                                 onClick={() => setMode(mode === 'preview' ? 'edit' : 'preview')}
                             >
-                                {mode === 'preview' ? '✏️ 수정' : '👁️ 미리보기'}
+                                {mode === 'preview' ? '수정' : '미리보기'}
                             </button>
-                            <button className="btn btn-outline" onClick={handleCopy}>📋 복사</button>
+                            <button className="btn btn-outline" onClick={handleCopy}>복사</button>
                         </>
                     )}
                     <button
@@ -128,7 +154,7 @@ export default function JournalSection({ stats, trades, history }) {
                         onClick={handleGenerate}
                         disabled={loading}
                     >
-                        {loading ? '생성 중...' : '✨ 일지 생성'}
+                        {loading ? '생성 중...' : '일지 생성'}
                     </button>
                 </div>
             </div>

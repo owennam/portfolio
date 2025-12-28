@@ -2,11 +2,13 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function NetWorthPage() {
     const [assets, setAssets] = useState([]);
     const [liabilities, setLiabilities] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
 
     // Form States
     const [assetForm, setAssetForm] = useState({ category: 'Real Estate', name: '', value: '', memo: '' });
@@ -34,15 +36,25 @@ export default function NetWorthPage() {
 
     const handleAssetSubmit = async (e) => {
         e.preventDefault();
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
         try {
+            const token = await user.getIdToken();
             const res = await fetch('/api/assets', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(assetForm)
             });
             if (res.ok) {
                 setAssetForm({ category: 'Real Estate', name: '', value: '', memo: '' });
                 fetchAll();
+            } else {
+                alert('추가 실패: ' + res.statusText);
             }
         } catch (error) {
             console.error('Failed to add asset', error);
@@ -51,15 +63,25 @@ export default function NetWorthPage() {
 
     const handleLiabilitySubmit = async (e) => {
         e.preventDefault();
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
         try {
+            const token = await user.getIdToken();
             const res = await fetch('/api/liabilities', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(liabilityForm)
             });
             if (res.ok) {
                 setLiabilityForm({ name: '', amount: '', interestRate: '', maturityDate: '' });
                 fetchAll();
+            } else {
+                alert('추가 실패: ' + res.statusText);
             }
         } catch (error) {
             console.error('Failed to add liability', error);
@@ -68,13 +90,29 @@ export default function NetWorthPage() {
 
     const handleDeleteAsset = async (id) => {
         if (!confirm('삭제하시겠습니까?')) return;
-        await fetch(`/api/assets?id=${id}`, { method: 'DELETE' });
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        const token = await user.getIdToken();
+        await fetch(`/api/assets?id=${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         fetchAll();
     };
 
     const handleDeleteLiability = async (id) => {
         if (!confirm('삭제하시겠습니까?')) return;
-        await fetch(`/api/liabilities?id=${id}`, { method: 'DELETE' });
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        const token = await user.getIdToken();
+        await fetch(`/api/liabilities?id=${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         fetchAll();
     };
 
@@ -87,14 +125,14 @@ export default function NetWorthPage() {
                     <h1>자산/부채 관리</h1>
                     <p>부동산, 현금, 대출 등을 관리합니다.</p>
                 </div>
-                <Link href="/" className="btn btn-outline">🏠 대시보드</Link>
+                <Link href="/" className="btn btn-outline">메인으로</Link>
             </header>
 
             <div className="grid-2">
                 {/* Assets Section */}
                 <div>
                     <div className="card" style={{ marginBottom: '2rem' }}>
-                        <h3>➕ 자산 추가 (부동산/현금)</h3>
+                        <h3>자산 추가 (부동산/현금)</h3>
                         <form onSubmit={handleAssetSubmit} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div className="grid-2">
                                 <div>
@@ -152,7 +190,7 @@ export default function NetWorthPage() {
                     </div>
 
                     <div className="card">
-                        <h3>📋 자산 목록</h3>
+                        <h3>자산 목록</h3>
                         <div style={{ marginTop: '1rem' }}>
                             {assets.map(item => (
                                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)' }}>
@@ -174,7 +212,7 @@ export default function NetWorthPage() {
                 {/* Liabilities Section */}
                 <div>
                     <div className="card" style={{ marginBottom: '2rem' }}>
-                        <h3>➕ 부채 추가 (대출)</h3>
+                        <h3>부채 추가 (대출)</h3>
                         <form onSubmit={handleLiabilitySubmit} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div>
                                 <label className="text-sm text-muted">대출명</label>
@@ -230,7 +268,7 @@ export default function NetWorthPage() {
                     </div>
 
                     <div className="card">
-                        <h3>📋 부채 목록</h3>
+                        <h3>부채 목록</h3>
                         <div style={{ marginTop: '1rem' }}>
                             {liabilities.map(item => (
                                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)' }}>
