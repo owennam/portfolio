@@ -1,5 +1,6 @@
 import yahooFinance from 'yahoo-finance2';
 import { generateGrokResponse } from '@/lib/grok';
+import { getKoreanNameByTicker } from '@/lib/koreanStocks';
 const yf = new yahooFinance();
 
 export async function POST(request) {
@@ -108,7 +109,11 @@ export async function POST(request) {
             const todayTrades = trades.filter(t => t.date === todayISO);
             if (todayTrades.length > 0) {
                 todayTrades.forEach(t => {
-                    context += `- ${t.type} ${t.name || t.ticker} ${t.quantity} shares @ ${t.price.toLocaleString()}\n`;
+                    let displayName = t.name;
+                    if (!displayName || displayName === '종목을 찾을 수 없음' || displayName === 'Unknown') {
+                        displayName = getKoreanNameByTicker(t.ticker) || t.ticker;
+                    }
+                    context += `- ${t.type} ${displayName} ${t.quantity} shares @ ${t.price.toLocaleString()}\n`;
                 });
             } else {
                 context += "No trades today.\n";
