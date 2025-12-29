@@ -6,6 +6,7 @@ import TradeList from '@/components/Trade/TradeList';
 import AllocationChart from '@/components/Dashboard/AllocationChart';
 import SummaryCards from '@/components/Dashboard/SummaryCards';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function PortfolioPage() {
     const [trades, setTrades] = useState([]);
@@ -65,13 +66,33 @@ export default function PortfolioPage() {
         setTrades(prev => [...prev, newTrade]);
     };
 
+    const { user } = useAuth(); // Import useAuth hook
+
     const handleTradeDeleted = async (tradeId) => {
         if (!confirm('정말 삭제하시겠습니까?')) return;
+
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
         try {
-            const res = await fetch(`/api/trades?id=${tradeId}`, { method: 'DELETE' });
-            if (res.ok) setTrades(prev => prev.filter(t => t.id !== tradeId));
+            const token = await user.getIdToken();
+            const res = await fetch(`/api/trades?id=${tradeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (res.ok) {
+                setTrades(prev => prev.filter(t => t.id !== tradeId));
+                alert('삭제되었습니다.');
+            } else {
+                alert('삭제 실패: ' + res.statusText);
+            }
         } catch (error) {
             console.error('Failed to delete trade', error);
+            alert('삭제 중 오류 발생');
         }
     };
 

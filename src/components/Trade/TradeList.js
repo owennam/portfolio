@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { format, subWeeks, subMonths, subYears, isAfter } from 'date-fns';
 import { getKoreanNameByTicker } from '@/lib/koreanStocks';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted, onTradeUpdated }) {
     const [filter, setFilter] = useState('All');
@@ -44,11 +45,22 @@ export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted
 
     const [editingTrade, setEditingTrade] = useState(null);
 
+    const { user } = useAuth();
+
     const handleAccountUpdate = async (tradeId, newAccount) => {
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
         try {
+            const token = await user.getIdToken();
             const res = await fetch('/api/trades', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ id: tradeId, account: newAccount })
             });
 
@@ -56,11 +68,11 @@ export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted
                 if (onTradeUpdated) onTradeUpdated(); // Re-fetch
                 setEditingTrade(null);
             } else {
-                alert('Failed to update account');
+                alert('계좌이동 실패: ' + res.statusText);
             }
         } catch (error) {
             console.error('Update failed', error);
-            alert('Update failed');
+            alert('계좌이동 중 오류 발생');
         }
     };
 
