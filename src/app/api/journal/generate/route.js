@@ -92,6 +92,23 @@ export async function POST(request) {
             context += `\n`;
         }
 
+        // Current Holdings
+        if (holdings && holdings.length > 0) {
+            context += `[Current Holdings]\n`;
+            holdings.forEach(h => {
+                let displayName = h.name;
+                if (!displayName || displayName === '종목을 찾을 수 없음' || displayName === 'Unknown') {
+                    displayName = getKoreanNameByTicker(h.ticker) || h.ticker;
+                }
+                const valueStr = h.value ? Math.round(h.value).toLocaleString() : '0';
+                const profitStr = h.totalReturn ? `${h.totalReturn.toFixed(2)}%` : '0%';
+
+                // For crypto, ticker usually acts as name, but let's be explicit
+                context += `- ${displayName} (${h.ticker}): ${valueStr} KRW (${profitStr})\n`;
+            });
+            context += `\n`;
+        }
+
         // Market Data
         context += `[Market Overview]\n`;
         marketData.forEach(item => {
