@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { format, subWeeks, subMonths, subYears, isAfter } from 'date-fns';
+import { getKoreanNameByTicker } from '@/lib/koreanStocks';
 
 export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted, onTradeUpdated }) {
     const [filter, setFilter] = useState('All');
@@ -140,7 +141,7 @@ export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted
                                             style={{ fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                                             onClick={() => setEditingTrade(editingTrade === trade.id ? null : trade.id)}
                                         >
-                                            {trade.name || trade.ticker}
+                                            {(trade.name && trade.name !== '종목을 찾을 수 없음') ? trade.name : (getKoreanNameByTicker(trade.ticker) || trade.ticker)}
                                             <span style={{
                                                 fontSize: '0.7rem',
                                                 padding: '2px 6px',

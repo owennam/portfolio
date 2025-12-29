@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import StockAutocomplete from '@/components/StockAutocomplete';
+import { getKoreanNameByTicker } from '@/lib/koreanStocks';
 
 export default function TradeForm({ onTradeAdded }) {
     const [formData, setFormData] = useState({
@@ -133,7 +134,13 @@ export default function TradeForm({ onTradeAdded }) {
             if (data && data.length > 0 && data[0].shortName) {
                 setStockName(data[0].shortName);
             } else {
-                setStockName('종목을 찾을 수 없음');
+                // Fallback to local Korean stock map
+                const koreanName = getKoreanNameByTicker(searchTicker);
+                if (koreanName) {
+                    setStockName(koreanName);
+                } else {
+                    setStockName('종목을 찾을 수 없음');
+                }
             }
         } catch (error) {
             setStockName('조회 실패');
