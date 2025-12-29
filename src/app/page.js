@@ -11,16 +11,44 @@ import { useAuth } from '@/contexts/AuthContext';
 
 function LandingHero() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '60vh',
+            textAlign: 'center',
+            padding: '2rem'
+        }}>
+            <h1 className="text-5xl font-bold mb-6" style={{
+                fontSize: '3rem',
+                fontWeight: 'bold',
+                marginBottom: '1.5rem',
+                background: 'linear-gradient(to right, #60a5fa, #9333ea)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+            }}>
                 AntiGravity Portfolio
             </h1>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl">
+            <p className="text-xl text-gray-400 mb-8 max-w-2xl" style={{
+                fontSize: '1.25rem',
+                color: '#9ca3af',
+                marginBottom: '2rem',
+                maxWidth: '42rem'
+            }}>
                 나만의 투자 포트폴리오를 관리하고, AI 분석을 통해 더 나은 투자 결정을 내려보세요.
             </p>
-            <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700 backdrop-blur-sm">
-                <p className="text-gray-300 mb-4">시작하려면 로그인이 필요합니다.</p>
-                <Login />
+            <div style={{
+                padding: '1.5rem',
+                backgroundColor: 'rgba(31, 41, 55, 0.5)',
+                borderRadius: '0.75rem',
+                border: '1px solid #374151',
+                backdropFilter: 'blur(4px)'
+            }}>
+                <p style={{ color: '#d1d5db', marginBottom: '1rem' }}>시작하려면 로그인이 필요합니다.</p>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Login />
+                </div>
             </div>
         </div>
     );
@@ -28,6 +56,7 @@ function LandingHero() {
 
 export default function Home() {
     const { user, loading: authLoading } = useAuth();
+    // ... existing logic ...
     const [trades, setTrades] = useState([]);
     const [prices, setPrices] = useState([]);
     const [stats, setStats] = useState({ totalValue: 0, totalInvested: 0, netProfit: 0, roi: 0, assets: [] });
@@ -36,6 +65,8 @@ export default function Home() {
     const [liabilities, setLiabilities] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
     const [exchangeRate, setExchangeRate] = useState(null);
+
+    // ... (fetch logic remains same) ...
 
     // 1. Fetch All Data
     const fetchAllData = async () => {
@@ -147,7 +178,6 @@ export default function Home() {
                     <div>
                         <h1>My Portfolio</h1>
                     </div>
-                    <Login />
                 </header>
                 <LandingHero />
             </div>
