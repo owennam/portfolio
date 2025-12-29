@@ -117,10 +117,11 @@ export default function TradeForm({ onTradeAdded }) {
         });
     };
 
-    const handleTickerBlur = async () => {
-        if (!formData.ticker) return;
+    const handleTickerBlur = async (tickerArg) => {
+        const currentTicker = tickerArg !== undefined ? tickerArg : formData.ticker;
+        if (!currentTicker) return;
 
-        let searchTicker = formData.ticker;
+        let searchTicker = currentTicker;
         // Auto-append -USD for Crypto if not present
         if (formData.category === '암호화폐' && !searchTicker.includes('-')) {
             searchTicker = `${searchTicker.toUpperCase()}-USD`;
@@ -233,14 +234,14 @@ export default function TradeForm({ onTradeAdded }) {
                             <option value="현금">현금</option>
                         </select>
                     </div>
-                    <div style={{ flex: 2, minWidth: '200px' }}>
+                    <div style={{ flex: 2, minWidth: '200px', position: 'relative' }}>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>티커</label>
                         <StockAutocomplete
                             value={formData.ticker}
                             onChange={(val) => {
                                 setFormData(prev => ({ ...prev, ticker: val }));
                                 if (val) {
-                                    setTimeout(() => handleTickerBlur(), 100);
+                                    setTimeout(() => handleTickerBlur(val), 100);
                                 }
                             }}
                             onSelect={(stock) => {
