@@ -10,7 +10,7 @@ export async function fetchPortfolioNews(tickers) {
         // Dynamic import to handle potential environment issues
         const module = await import('yahoo-finance2');
         yahooFinance = module.default || module;
-        yahooFinance.suppressNotices(['yahooSurvey']);
+
     } catch (e) {
         console.warn('Yahoo Finance library could not be loaded, using mock data.', e.message);
     }

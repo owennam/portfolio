@@ -3,7 +3,7 @@ import path from 'path';
 import yahooFinance from 'yahoo-finance2';
 
 const dataFilePath = path.join(process.cwd(), 'data', 'analysis.json');
-const yf = new yahooFinance({ suppressNotices: ['yahooSurvey'] });
+const yf = new yahooFinance();
 
 async function getAnalysisData() {
     try {

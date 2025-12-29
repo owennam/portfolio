@@ -1,6 +1,6 @@
 import yahooFinance from 'yahoo-finance2';
 import { generateGrokResponse } from '@/lib/grok';
-const yf = new yahooFinance({ suppressNotices: ['yahooSurvey'] });
+const yf = new yahooFinance();
 
 export async function POST(request) {
     try {

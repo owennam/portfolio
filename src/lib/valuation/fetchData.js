@@ -1,7 +1,7 @@
 import yahooFinance from 'yahoo-finance2';
 
-// Suppress warnings
-yahooFinance.suppressNotices(['yahooSurvey']);
+// Suppress warnings removed in v3
+
 
 export async function fetchFinancialData(ticker) {
     try {

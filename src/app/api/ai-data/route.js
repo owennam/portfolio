@@ -5,7 +5,7 @@ import yahooFinance from 'yahoo-finance2';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
 import { fetchMacroData } from '@/lib/macroUtils';
 
-const yf = new yahooFinance({ suppressNotices: ['yahooSurvey'] });
+const yf = new yahooFinance();
 
 export async function GET() {
     try {

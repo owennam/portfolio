@@ -1,5 +1,5 @@
 import yahooFinance from 'yahoo-finance2';
-const yf = new yahooFinance({ suppressNotices: ['yahooSurvey'] });
+const yf = new yahooFinance();
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
