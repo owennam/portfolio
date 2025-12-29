@@ -7,15 +7,34 @@ import RoastSection from '@/components/Dashboard/RoastSection';
 import MarketIndices from '@/components/Dashboard/MarketIndices';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
 import Login from '@/components/Auth/Login';
+import { useAuth } from '@/contexts/AuthContext';
+
+function LandingHero() {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+                AntiGravity Portfolio
+            </h1>
+            <p className="text-xl text-gray-400 mb-8 max-w-2xl">
+                나만의 투자 포트폴리오를 관리하고, AI 분석을 통해 더 나은 투자 결정을 내려보세요.
+            </p>
+            <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700 backdrop-blur-sm">
+                <p className="text-gray-300 mb-4">시작하려면 로그인이 필요합니다.</p>
+                <Login />
+            </div>
+        </div>
+    );
+}
 
 export default function Home() {
+    const { user, loading: authLoading } = useAuth();
     const [trades, setTrades] = useState([]);
     const [prices, setPrices] = useState([]);
     const [stats, setStats] = useState({ totalValue: 0, totalInvested: 0, netProfit: 0, roi: 0, assets: [] });
     const [history, setHistory] = useState([]);
     const [manualAssets, setManualAssets] = useState([]);
     const [liabilities, setLiabilities] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [dataLoading, setDataLoading] = useState(true);
     const [exchangeRate, setExchangeRate] = useState(null);
 
     // 1. Fetch All Data
@@ -38,17 +57,19 @@ export default function Home() {
     };
 
     useEffect(() => {
-        fetchAllData();
-    }, []);
+        if (user) {
+            fetchAllData();
+        }
+    }, [user]);
 
     // 2. Fetch Prices
     useEffect(() => {
-        const fetchPrices = async () => {
-            if (trades.length === 0) {
-                setLoading(false);
-                return;
-            }
+        if (!user || trades.length === 0) {
+            setDataLoading(false);
+            return;
+        }
 
+        const fetchPrices = async () => {
             const tickers = [...new Set(trades.map(t => t.ticker))];
             const allTickers = [...tickers, 'KRW=X']; // USD/KRW
 
@@ -62,16 +83,16 @@ export default function Home() {
             } catch (error) {
                 console.error('Failed to fetch prices', error);
             } finally {
-                setLoading(false);
+                setDataLoading(false);
             }
         };
 
         fetchPrices();
-    }, [trades]);
+    }, [trades, user]);
 
     // 3. Calculate Stats & Auto-Save History
     useEffect(() => {
-        if (!loading && prices.length > 0) {
+        if (user && !dataLoading && prices.length > 0) {
             const computedStats = calculatePortfolioStats(trades, prices, exchangeRate);
             setStats(computedStats);
 
@@ -81,28 +102,57 @@ export default function Home() {
             const totalAssets = computedStats.totalValue + manualAssetsValue;
             const netWorth = totalAssets - liabilitiesValue;
 
-            // Auto-save history
+            // Auto-save history (Only if user is logged in)
             if (computedStats.totalValue > 0) {
                 const today = new Date().toLocaleDateString('en-CA');
-                fetch('/api/history', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        date: today,
-                        totalValue: computedStats.totalValue,
-                        investedAmount: computedStats.totalInvested,
-                        netWorth: netWorth,
-                        totalAssets: totalAssets,
-                        liabilities: liabilitiesValue
-                    })
-                }).then(res => res.json())
-                    .then(data => {
-                        if (data.history) setHistory(data.history);
-                    })
-                    .catch(err => console.error('Failed to auto-save history', err));
+                // Auto-save logic calls API which is protected, but client sends token in simpler implementation
+                // For now, let's keep GET logic but ensure POST actions are token-gated by components or explicitly here.
+                // Actually, the previous task added 'verifyAuth' to POST /api/history.
+                // So this `fetch` call will fail without Auth header.
+                // We need to attach token here if we want auto-save to work.
+
+                user.getIdToken().then(token => {
+                    fetch('/api/history', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            date: today,
+                            totalValue: computedStats.totalValue,
+                            investedAmount: computedStats.totalInvested,
+                            netWorth: netWorth,
+                            totalAssets: totalAssets,
+                            liabilities: liabilitiesValue
+                        })
+                    }).then(res => res.json())
+                        .then(data => {
+                            if (data.history) setHistory(data.history);
+                        })
+                        .catch(err => console.error('Failed to auto-save history', err));
+                });
             }
         }
-    }, [trades, prices, loading, exchangeRate, manualAssets, liabilities]);
+    }, [trades, prices, dataLoading, exchangeRate, manualAssets, liabilities, user]);
+
+    // Render Loading State
+    if (authLoading) return <div className="text-center p-10">Loading...</div>;
+
+    // Render Landing Page if not logged in
+    if (!user) {
+        return (
+            <div className="container">
+                <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <h1>My Portfolio</h1>
+                    </div>
+                    <Login />
+                </header>
+                <LandingHero />
+            </div>
+        );
+    }
 
     // Net Worth Calculation for UI
     const realEstateValue = manualAssets.filter(a => a.category === 'Real Estate').reduce((sum, item) => sum + parseFloat(item.value), 0);
@@ -123,6 +173,7 @@ export default function Home() {
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     <Login />
+
                     <Link href="/portfolio" className="btn btn-outline" style={{ borderColor: '#eab308', color: '#eab308' }}>
                         포트폴리오
                     </Link>
