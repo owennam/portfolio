@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 const AuthContext = createContext({});
@@ -11,15 +11,30 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-            setLoading(false);
-        });
-        return () => unsubscribe();
+        const initializeAuth = async () => {
+            try {
+                // Set persistence to SESSION (clears on window close)
+                await setPersistence(auth, browserSessionPersistence);
+            } catch (error) {
+                console.error("Failed to set persistence:", error);
+            }
+
+            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                setUser(currentUser);
+                setLoading(false);
+            });
+            return unsubscribe;
+        };
+
+        const cleanupPromise = initializeAuth();
+        return () => {
+            cleanupPromise.then(unsubscribe => unsubscribe && unsubscribe());
+        };
     }, []);
 
     const signIn = async () => {
         const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
         try {
             await signInWithPopup(auth, provider);
         } catch (error) {

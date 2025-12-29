@@ -7,8 +7,18 @@ import AllocationChart from '@/components/Dashboard/AllocationChart';
 import SummaryCards from '@/components/Dashboard/SummaryCards';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function PortfolioPage() {
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push('/');
+        }
+    }, [user, authLoading, router]);
+
     const [trades, setTrades] = useState([]);
     const [prices, setPrices] = useState([]);
     const [stats, setStats] = useState({ totalValue: 0, totalInvested: 0, netProfit: 0, roi: 0, assets: [] });
@@ -66,7 +76,7 @@ export default function PortfolioPage() {
         setTrades(prev => [...prev, newTrade]);
     };
 
-    const { user } = useAuth(); // Import useAuth hook
+
 
     const handleTradeDeleted = async (tradeId) => {
         if (!confirm('정말 삭제하시겠습니까?')) return;
@@ -99,6 +109,10 @@ export default function PortfolioPage() {
     const handleTradeUpdated = async () => {
         await fetchTrades();
     };
+
+    if (authLoading || !user) {
+        return <div className="p-8 text-center">Loading...</div>;
+    }
 
     return (
         <div className="container">
