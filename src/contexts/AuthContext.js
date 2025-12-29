@@ -24,6 +24,7 @@ export function AuthProvider({ children }) {
             await signInWithPopup(auth, provider);
         } catch (error) {
             console.error("Error signing in with Google", error);
+            alert(`로그인 실패: ${error.message}`);
         }
     };
 
