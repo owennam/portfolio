@@ -22,14 +22,24 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
 
         setLoading(true);
         try {
-            const sortedTrades = [...trades].sort((a, b) => (b.price * b.quantity) - (a.price * a.quantity));
-            const topHoldings = sortedTrades.slice(0, 3).map(t => ({ ticker: t.ticker, name: t.name }));
+
+            // Use calculated assets from stats if available, otherwise fallback to trades (top 20)
+            const currentHoldings = stats.assets && stats.assets.length > 0
+                ? stats.assets.map(a => ({
+                    ticker: a.ticker,
+                    name: a.name,
+                    value: a.currentValue, // Calculated current value
+                    quantity: a.quantity,
+                    roi: a.roi,
+                    totalReturn: a.roi // Alias for AI context
+                }))
+                : [...trades].sort((a, b) => (b.price * b.quantity) - (a.price * a.quantity)).slice(0, 20);
 
             const res = await fetch('/api/journal/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    holdings: topHoldings,
+                    holdings: currentHoldings,
                     stats: {
                         totalValue: stats.totalValue,
                         netProfit: stats.netProfit,
@@ -40,6 +50,7 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
                     history: history
                 })
             });
+
             const data = await res.json();
             if (data.markdown) {
                 setJournal(data.markdown);

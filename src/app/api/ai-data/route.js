@@ -1,6 +1,6 @@
 
 import yahooFinance from 'yahoo-finance2';
-import { calculatePortfolioStats } from '@/lib/portfolioUtils';
+import { calculatePortfolioStats, normalizeTicker } from '@/lib/portfolioUtils';
 import { fetchMacroData } from '@/lib/macroUtils';
 import { db, verifyAuth } from '@/lib/firebaseAdmin';
 
@@ -19,8 +19,11 @@ export async function GET(request) {
             db.collection('journals').orderBy('date', 'desc').get()
         ]);
 
+
         const trades = tradesSnapshot.docs.map(doc => doc.data());
         const journals = journalsSnapshot.docs.map(doc => doc.data());
+        console.log(`[AI-DATA] Trades found: ${trades.length}, Journals found: ${journals.length}`);
+
 
         // 2. Get Unique Tickers for Price Fetching
         const tickers = [...new Set(trades.map(t => t.ticker))];
@@ -100,8 +103,8 @@ export async function GET(request) {
                 exchangeRate: exchangeRate
             },
             holdings: stats.assets.map(a => {
-                // Find price object to get daily change
-                const priceObj = prices.find(p => p.ticker === a.ticker);
+                // Find price object to get daily change (Robust matching)
+                const priceObj = prices.find(p => normalizeTicker(p.ticker) === normalizeTicker(a.ticker));
                 return {
                     ticker: a.ticker,
                     name: a.name,
