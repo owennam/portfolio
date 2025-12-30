@@ -143,7 +143,7 @@ export default function TradeList({ trades, prices, exchangeRate, onTradeDeleted
                                 <tr key={trade.id} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.75rem' }}>{trade.date}</td>
                                     <td style={{ padding: '0.75rem' }}>
-                                        <span className={`badge ${trade.type === 'Buy' ? 'badge-danger' : 'badge-success'}`}>
+                                        <span className={`badge ${trade.type === 'Buy' ? 'badge-success' : 'badge-danger'}`}>
                                             {trade.type === 'Buy' ? '매수' : '매도'}
                                         </span>
                                     </td>

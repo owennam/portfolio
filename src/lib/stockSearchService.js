@@ -47,25 +47,34 @@ export class StockSearchService {
 
     const normalizedQuery = query.trim().toLowerCase();
     const results = [];
+    const exactMatches = [];
+    const startMatches = [];
+    const containsMatches = [];
+    const tickerMatches = [];
 
     for (const [name, ticker] of Object.entries(this.koreanStocks)) {
       const normalizedName = name.toLowerCase();
+      const normalizedTicker = ticker.toLowerCase();
 
-      // 정확히 일치하는 경우 우선순위
-      if (normalizedName === normalizedQuery) {
-        results.unshift({ name, ticker });
+      // 정확히 일치하는 경우 최우선순위
+      if (normalizedName === normalizedQuery || normalizedTicker === normalizedQuery) {
+        exactMatches.push({ name, ticker });
       }
       // 시작하는 경우 두 번째 우선순위
       else if (normalizedName.startsWith(normalizedQuery)) {
-        results.push({ name, ticker });
+        startMatches.push({ name, ticker });
       }
-      // 포함하는 경우 세 번째 우선순위
-      else if (normalizedName.includes(normalizedQuery)) {
-        results.push({ name, ticker });
+      // Ticker로 시작하는 경우 세 번째 우선순위
+      else if (normalizedTicker.startsWith(normalizedQuery)) {
+        tickerMatches.push({ name, ticker });
+      }
+      // 포함하는 경우 네 번째 우선순위
+      else if (normalizedName.includes(normalizedQuery) || normalizedTicker.includes(normalizedQuery)) {
+        containsMatches.push({ name, ticker });
       }
     }
 
-    return results.slice(0, limit);
+    return [...exactMatches, ...startMatches, ...tickerMatches, ...containsMatches].slice(0, limit);
   }
 
   /**
