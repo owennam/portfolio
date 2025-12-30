@@ -15,7 +15,9 @@ export class StockSearchService {
     try {
       if (fs.existsSync(KOREAN_STOCKS_FILE)) {
         const data = fs.readFileSync(KOREAN_STOCKS_FILE, 'utf8');
-        return JSON.parse(data);
+        // Clear BOM if present to prevent JSON parse error
+        const cleanData = data.replace(/^\uFEFF/, '');
+        return JSON.parse(cleanData);
       }
     } catch (error) {
       console.error('Error loading Korean stocks:', error);
