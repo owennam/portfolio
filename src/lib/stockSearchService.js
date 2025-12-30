@@ -50,31 +50,37 @@ export class StockSearchService {
     const exactMatches = [];
     const startMatches = [];
     const containsMatches = [];
-    const tickerMatches = [];
+    const tickerMatches = []; // This array is no longer strictly needed with the new logic, but keeping it for now if the user wants to revert to the old structure.
 
     for (const [name, ticker] of Object.entries(this.koreanStocks)) {
       const normalizedName = name.toLowerCase();
       const normalizedTicker = ticker.toLowerCase();
 
-      // 정확히 일치하는 경우 최우선순위
+      // 정확히 일치하는 경우 (이름 또는 티커)
       if (normalizedName === normalizedQuery || normalizedTicker === normalizedQuery) {
-        exactMatches.push({ name, ticker });
+        results.unshift({ name, ticker });
       }
-      // 시작하는 경우 두 번째 우선순위
-      else if (normalizedName.startsWith(normalizedQuery)) {
-        startMatches.push({ name, ticker });
+      // 시작하는 경우 (이름 또는 티커)
+      else if (normalizedName.startsWith(normalizedQuery) || normalizedTicker.startsWith(normalizedQuery)) {
+        results.push({ name, ticker });
       }
-      // Ticker로 시작하는 경우 세 번째 우선순위
-      else if (normalizedTicker.startsWith(normalizedQuery)) {
-        tickerMatches.push({ name, ticker });
-      }
-      // 포함하는 경우 네 번째 우선순위
+      // 포함하는 경우 (이름 또는 티커)
       else if (normalizedName.includes(normalizedQuery) || normalizedTicker.includes(normalizedQuery)) {
-        containsMatches.push({ name, ticker });
+        results.push({ name, ticker });
       }
     }
 
-    return [...exactMatches, ...startMatches, ...tickerMatches, ...containsMatches].slice(0, limit);
+    // Remove duplicates and limit results
+    const uniqueResults = [];
+    const seenTickers = new Set();
+    for (const item of results) {
+      if (!seenTickers.has(item.ticker)) {
+        uniqueResults.push(item);
+        seenTickers.add(item.ticker);
+      }
+    }
+
+    return uniqueResults.slice(0, limit);
   }
 
   /**
