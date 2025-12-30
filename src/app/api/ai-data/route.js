@@ -2,12 +2,17 @@
 import yahooFinance from 'yahoo-finance2';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
 import { fetchMacroData } from '@/lib/macroUtils';
-import { db } from '@/lib/firebaseAdmin';
+import { db, verifyAuth } from '@/lib/firebaseAdmin';
 
 const yf = new yahooFinance();
 
-export async function GET() {
+export async function GET(request) {
     try {
+        const decodedToken = await verifyAuth(request);
+        if (!decodedToken) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         // 1. Load Data from Firestore
         const [tradesSnapshot, journalsSnapshot] = await Promise.all([
             db.collection('trades').get(),

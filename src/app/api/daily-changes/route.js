@@ -1,10 +1,15 @@
 import yahooFinance from 'yahoo-finance2';
-import { db } from '@/lib/firebaseAdmin';
+import { db, verifyAuth } from '@/lib/firebaseAdmin';
 
 const yf = new yahooFinance();
 
-export async function GET() {
+export async function GET(request) {
     try {
+        const decodedToken = await verifyAuth(request);
+        if (!decodedToken) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         // 1. Read Trades from Firestore
         const snapshot = await db.collection('trades').get();
         const trades = snapshot.docs.map(doc => doc.data());
