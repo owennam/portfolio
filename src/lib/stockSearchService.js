@@ -45,7 +45,7 @@ export class StockSearchService {
       return [];
     }
 
-    const normalizedQuery = query.trim().toUpperCase();
+    const normalizedQuery = query.trim().toLowerCase();
     const results = [];
     const exactMatches = [];
     const startMatches = [];
@@ -53,8 +53,8 @@ export class StockSearchService {
     const tickerMatches = [];
 
     for (const [name, ticker] of Object.entries(this.koreanStocks)) {
-      const normalizedName = name.toUpperCase();
-      const normalizedTicker = ticker.toUpperCase();
+      const normalizedName = name.toLowerCase();
+      const normalizedTicker = ticker.toLowerCase();
 
       // 정확히 일치하는 경우 최우선순위
       if (normalizedName === normalizedQuery || normalizedTicker === normalizedQuery) {
