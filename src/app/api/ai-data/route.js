@@ -61,7 +61,7 @@ export async function GET() {
             }
         });
 
-        const prices = (await Promise.all(pricePromises)).filter(p => p !== null);
+        const prices = (await Promise.all(pricePromises)).filter(p => p !== null && typeof p.price === 'number' && p.price > 0);
 
         // 4. Fetch Exchange Rate
         let exchangeRate = 1400;
@@ -70,6 +70,12 @@ export async function GET() {
             exchangeRate = rateQuote.regularMarketPrice;
         } catch (e) {
             console.error('Failed to fetch exchange rate', e);
+        }
+
+        // Sanity Check for Exchange Rate
+        if (!exchangeRate || exchangeRate < 100) {
+            console.warn('Invalid exchange rate detected, using fallback (1400)');
+            exchangeRate = 1400;
         }
 
         // 5. Calculate Stats

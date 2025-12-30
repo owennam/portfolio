@@ -78,7 +78,9 @@ export function calculatePortfolioStats(trades, currentPrices, exchangeRate = 1)
         if (holding.quantity <= 0.000001) return; // Ignore sold out positions
 
         const currentPriceObj = currentPrices.find(p => normalizeTicker(p.ticker) === holding.ticker);
-        const currentPrice = currentPriceObj && !currentPriceObj.error ? currentPriceObj.price : holding.avgPrice;
+        // Robust Price Check: Must be number and > 0. Else fallback to Avg Price.
+        const isValidPrice = currentPriceObj && typeof currentPriceObj.price === 'number' && currentPriceObj.price > 0;
+        const currentPrice = isValidPrice ? currentPriceObj.price : holding.avgPrice;
 
         let currentValue = holding.quantity * currentPrice;
         let investedValue = holding.totalCost;

@@ -57,7 +57,8 @@ export async function GET(request) {
             })
         );
 
-        return Response.json(results);
+        const validResults = results.filter(r => r && !r.error && typeof r.price === 'number' && r.price > 0);
+        return Response.json(validResults);
     } catch (error) {
         return Response.json({ error: 'Failed to fetch prices' }, { status: 500 });
     }
