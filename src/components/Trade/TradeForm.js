@@ -7,15 +7,15 @@ import { getKoreanNameByTicker } from '@/lib/koreanStocks';
 export default function TradeForm({ onTradeAdded }) {
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
-        type: 'Buy',
-        assetClass: 'Domestic Stock',
+        type: '매수',
+        category: '국내 주식',
         ticker: '',
         price: '',
         quantity: '',
         fee: '',
         reason: '',
         exchangeRate: 1400,
-        account: 'General'
+        account: '일반'
     });
     const [stockName, setStockName] = useState('');
     const [fetchingName, setFetchingName] = useState(false);
@@ -78,8 +78,8 @@ export default function TradeForm({ onTradeAdded }) {
         setFormData(prev => {
             const updated = { ...prev, [name]: value };
 
-            // Auto-calculate fee if price/quantity/assetClass/type/account changes
-            if (['price', 'quantity', 'assetClass', 'type', 'account'].includes(name)) {
+            // Auto-calculate fee if price/quantity/category/type/account changes
+            if (['price', 'quantity', 'category', 'type', 'account'].includes(name)) {
                 const price = parseFloat(updated.price) || 0;
                 const qty = parseFloat(updated.quantity) || 0;
                 const amount = price * qty;
@@ -87,18 +87,18 @@ export default function TradeForm({ onTradeAdded }) {
                 if (amount > 0) {
                     let rate = 0;
 
-                    if (updated.assetClass === 'Crypto') {
+                    if (updated.category === '암호화폐') {
                         // Binance: 0.1%
                         rate = 0.001;
-                    } else if (updated.assetClass === 'US Stock') {
+                    } else if (updated.category === '해외 주식') {
                         // Samsung Securities (US): 0.07% (Event rate assumption)
                         rate = 0.0007;
-                    } else if (updated.assetClass === 'Domestic Stock') {
-                        if (updated.account === 'General') {
+                    } else if (updated.category === '국내 주식') {
+                        if (updated.account === '일반') {
                             // Samsung Securities (Domestic)
                             // Fee: ~0.0036396%, Tax (Sell only): 0.18%
                             const baseFee = 0.000036396;
-                            const tax = updated.type === 'Sell' ? 0.0018 : 0;
+                            const tax = updated.type === '매도' ? 0.0018 : 0; // Check for '매도' instead of 'Sell'
                             rate = baseFee + tax;
                         } else {
                             // Pension/IRP (Mirae Asset): ~0.0036396% (ETF)
@@ -106,7 +106,7 @@ export default function TradeForm({ onTradeAdded }) {
                         }
                     }
 
-                    if (['US Stock', 'Crypto'].includes(updated.assetClass)) {
+                    if (['해외 주식', '암호화폐'].includes(updated.category)) {
                         updated.fee = (amount * rate).toFixed(2);
                     } else {
                         updated.fee = Math.floor(amount * rate);
@@ -190,7 +190,7 @@ export default function TradeForm({ onTradeAdded }) {
                         >
                             <option value="일반">일반</option>
                             <option value="연금">연금</option>
-                            <option value="ISA">ISA</option>
+                            <option value="IRP">IRP</option>
                         </select>
                     </div>
                     <div style={{ flex: 1, minWidth: '100px' }}>
@@ -210,7 +210,6 @@ export default function TradeForm({ onTradeAdded }) {
                         >
                             <option value="매수">매수</option>
                             <option value="매도">매도</option>
-                            <option value="배당">배당</option>
                         </select>
                     </div>
                     <div style={{ flex: 1, minWidth: '100px' }}>
@@ -231,7 +230,6 @@ export default function TradeForm({ onTradeAdded }) {
                             <option value="국내 주식">국내 주식</option>
                             <option value="해외 주식">해외 주식</option>
                             <option value="암호화폐">암호화폐</option>
-                            <option value="현금">현금</option>
                         </select>
                     </div>
                     <div style={{ flex: 2, minWidth: '200px', position: 'relative' }}>
