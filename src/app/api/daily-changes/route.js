@@ -1,15 +1,13 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import yahooFinance from 'yahoo-finance2';
+import { db } from '@/lib/firebaseAdmin';
 
-const dataFilePath = path.join(process.cwd(), 'data', 'trades.json');
 const yf = new yahooFinance();
 
 export async function GET() {
     try {
-        // 1. Read Trades
-        const fileContent = await fs.readFile(dataFilePath, 'utf8');
-        const trades = JSON.parse(fileContent);
+        // 1. Read Trades from Firestore
+        const snapshot = await db.collection('trades').get();
+        const trades = snapshot.docs.map(doc => doc.data());
 
         // 2. Calculate Holdings
         const holdings = {};

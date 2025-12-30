@@ -1,25 +1,21 @@
 
-import { promises as fs } from 'fs';
-import path from 'path';
 import yahooFinance from 'yahoo-finance2';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
 import { fetchMacroData } from '@/lib/macroUtils';
+import { db } from '@/lib/firebaseAdmin';
 
 const yf = new yahooFinance();
 
 export async function GET() {
     try {
-        // 1. Load Data
-        const tradesPath = path.join(process.cwd(), 'data', 'trades.json');
-        const journalsPath = path.join(process.cwd(), 'data', 'journals.json');
-
-        const [tradesData, journalsData] = await Promise.all([
-            fs.readFile(tradesPath, 'utf8').catch(() => '[]'),
-            fs.readFile(journalsPath, 'utf8').catch(() => '[]')
+        // 1. Load Data from Firestore
+        const [tradesSnapshot, journalsSnapshot] = await Promise.all([
+            db.collection('trades').get(),
+            db.collection('journals').orderBy('date', 'desc').get()
         ]);
 
-        const trades = JSON.parse(tradesData);
-        const journals = JSON.parse(journalsData);
+        const trades = tradesSnapshot.docs.map(doc => doc.data());
+        const journals = journalsSnapshot.docs.map(doc => doc.data());
 
         // 2. Get Unique Tickers for Price Fetching
         const tickers = [...new Set(trades.map(t => t.ticker))];
