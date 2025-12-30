@@ -20,6 +20,7 @@ export default function TradeForm({ onTradeAdded }) {
     const [stockName, setStockName] = useState('');
     const [fetchingName, setFetchingName] = useState(false);
     const [currentRate, setCurrentRate] = useState(1400); // Default fallback
+    const [searchQuery, setSearchQuery] = useState(''); // Separate state for search input
 
     // Fetch Exchange Rate on Mount
     useEffect(() => {
@@ -75,6 +76,7 @@ export default function TradeForm({ onTradeAdded }) {
                 // Reset form (keep date/type/account/exchangeRate)
                 setFormData(prev => ({ ...prev, ticker: '', price: '', quantity: '', fee: '', reason: '' }));
                 setStockName('');
+                setSearchQuery('');
             } else {
                 alert('저장 실패: ' + res.statusText);
             }
@@ -246,16 +248,21 @@ export default function TradeForm({ onTradeAdded }) {
                     <div style={{ flex: 2, minWidth: '200px', position: 'relative' }}>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>티커</label>
                         <StockAutocomplete
-                            value={formData.ticker}
+                            value={searchQuery || formData.ticker}
                             onChange={(val) => {
-                                setFormData(prev => ({ ...prev, ticker: val }));
-                                if (val) {
-                                    setTimeout(() => handleTickerBlur(val), 100);
+                                setSearchQuery(val);
+                                // Clear existing ticker and stock name when user starts typing
+                                if (formData.ticker) {
+                                    setFormData(prev => ({ ...prev, ticker: '' }));
                                 }
+                                if (stockName) setStockName('');
                             }}
                             onSelect={(stock) => {
+                                setSearchQuery('');
                                 setFormData(prev => ({ ...prev, ticker: stock.ticker }));
                                 setStockName(stock.name);
+                                // Fetch price info for the selected stock
+                                setTimeout(() => handleTickerBlur(stock.ticker), 100);
                             }}
                             placeholder="종목명/티커 (예: 삼성전자, AAPL)"
                             useApi={true}
@@ -268,7 +275,7 @@ export default function TradeForm({ onTradeAdded }) {
                                 color: 'white'
                             }}
                         />
-                        {!fetchingName && stockName && <div className="text-xs text-success" style={{ position: 'absolute', top: '100%', left: 0, marginTop: '2px', whiteSpace: 'nowrap' }}>{stockName}</div>}
+                        {!fetchingName && stockName && formData.ticker && <div className="text-xs text-success" style={{ position: 'absolute', top: '100%', left: 0, marginTop: '2px', whiteSpace: 'nowrap' }}>{stockName}</div>}
                     </div>
                     <div style={{ flex: 1, minWidth: '120px' }}>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.2rem' }}>가격</label>
