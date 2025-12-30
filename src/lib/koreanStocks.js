@@ -47,7 +47,25 @@ export const KOREAN_STOCKS = {
     "HMM": "011200.KS",
     "HD현대중공업": "329180.KS",
     "강원랜드": "035250.KS",
-    "오리온": "271560.KS"
+    "오리온": "271560.KS",
+    "KODEX 200": "069500.KS",
+    "TIGER 200": "102110.KS",
+    "KODEX 레버리지": "122630.KS",
+    "KODEX 인버스": "114800.KS",
+    "KODEX 200선물인버스2X": "252670.KS",
+    "TIGER 미국나스닥100": "133690.KS",
+    "ACE 미국S&P500": "360200.KS",
+    "KODEX 미국S&P500TR": "379800.KS",
+    "TIGER 미국필라델피아반도체나스닥": "381180.KS",
+    "SOL 미국S&P500": "399860.KS",
+    "TIGER 미국배당다우존스": "458730.KS",
+    "ACE 미국배당다우존스": "441680.KS",
+    "SOL 미국배당다우존스": "446720.KS",
+    "TIGER 차이나전기차SOLACTIVE": "371460.KS",
+    "KODEX 2차전지산업": "305720.KS",
+    "TIGER 2차전지테마": "305540.KS",
+    "KODEX 코스닥150레버리지": "233740.KQ",
+    "KODEX 코스닥150선물인버스": "251340.KQ"
 };
 
 export const getKoreanNameByTicker = (ticker) => {
