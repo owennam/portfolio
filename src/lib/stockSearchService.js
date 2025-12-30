@@ -124,10 +124,9 @@ export class StockSearchService {
    */
   async searchYahooFinance(query) {
     try {
-      // Yahoo Finance 검색 쿼리에 .KS 추가하여 한국 주식 필터링
-      const searchQuery = `${query} KS`;
+      // Yahoo Finance API call without forcing .KS suffix
       const response = await fetch(
-        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(searchQuery)}&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query`,
+        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query`,
         {
           headers: {
             'User-Agent': 'Mozilla/5.0'
@@ -142,16 +141,18 @@ export class StockSearchService {
       const data = await response.json();
       const quotes = data.quotes || [];
 
-      // 한국 주식만 필터링 (.KS로 끝나는 것)
-      const koreanQuotes = quotes
-        .filter(quote => quote.symbol && quote.symbol.endsWith('.KS'))
+      // Return all relevant results found by Yahoo Finance
+      // Filter out items without a symbol
+      const validQuotes = quotes
+        .filter(quote => quote.symbol)
         .map(quote => ({
           name: quote.longname || quote.shortname || quote.symbol,
           ticker: quote.symbol,
-          exchange: quote.exchange
+          exchange: quote.exchange,
+          type: quote.quoteType // Useful for distinguishing Equity, ETF, Crypto
         }));
 
-      return koreanQuotes;
+      return validQuotes;
     } catch (error) {
       console.error('Yahoo Finance search error:', error);
       return [];
