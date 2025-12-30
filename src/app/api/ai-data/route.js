@@ -36,7 +36,8 @@ export async function GET() {
                 };
             } catch (e) {
                 // Fallback for Korean stocks if simple ticker fails
-                if (/^\d{6}$/.test(ticker)) {
+                // Fallback for Korean stocks if simple ticker fails (numeric or alphanumeric 6 chars)
+                if (/^[0-9A-Z]{6}$/.test(ticker)) {
                     try {
                         const quote = await yf.quote(ticker + '.KS');
                         return {

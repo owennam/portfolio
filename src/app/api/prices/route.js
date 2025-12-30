@@ -24,7 +24,8 @@ export async function GET(request) {
                     };
                 } catch (e) {
                     // If failed and looks like 6 digits, try .KS then .KQ
-                    if (/^\d{6}$/.test(ticker)) {
+                    // If failed and looks like 6 chars (digits or letters for some ETFs), try .KS then .KQ
+                    if (/^[0-9A-Z]{6}$/.test(ticker)) {
                         try {
                             const quote = await yf.quote(ticker + '.KS');
                             return {
