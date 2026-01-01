@@ -14,12 +14,21 @@ export function AuthProvider({ children }) {
         const initializeAuth = async () => {
             try {
                 // Set persistence to SESSION (clears on window close)
-                await setPersistence(auth, browserSessionPersistence);
+                const authInstance = auth();
+                if (authInstance) {
+                    await setPersistence(authInstance, browserSessionPersistence);
+                }
             } catch (error) {
                 console.error("Failed to set persistence:", error);
             }
 
-            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            const authInstance = auth();
+            if (!authInstance) {
+                setLoading(false);
+                return () => { };
+            }
+
+            const unsubscribe = onAuthStateChanged(authInstance, (currentUser) => {
                 setUser(currentUser);
                 setLoading(false);
             });
@@ -36,14 +45,14 @@ export function AuthProvider({ children }) {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
         try {
-            await signInWithPopup(auth, provider);
+            await signInWithPopup(auth(), provider);
         } catch (error) {
             console.error("Error signing in with Google", error);
             alert(`로그인 실패: ${error.message}`);
         }
     };
 
-    const signOut = () => firebaseSignOut(auth);
+    const signOut = () => firebaseSignOut(auth());
 
     return (
         <AuthContext.Provider value={{ user, loading, signIn, signOut }}>

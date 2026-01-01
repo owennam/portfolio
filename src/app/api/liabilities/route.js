@@ -5,7 +5,7 @@ const COLLECTION_NAME = 'liabilities';
 
 export async function GET() {
     try {
-        const snapshot = await db.collection(COLLECTION_NAME).get();
+        const snapshot = await db().collection(COLLECTION_NAME).get();
         const data = snapshot.docs.map(doc => doc.data());
         return Response.json(data);
     } catch (error) {
@@ -29,7 +29,7 @@ export async function POST(request) {
             ...item, // name, amount, interestRate, maturityDate
         };
 
-        await db.collection(COLLECTION_NAME).doc(newItem.id).set(newItem);
+        await db().collection(COLLECTION_NAME).doc(newItem.id).set(newItem);
 
         return Response.json(newItem);
     } catch (error) {
@@ -50,7 +50,7 @@ export async function DELETE(request) {
 
         if (!id) return Response.json({ error: 'ID required' }, { status: 400 });
 
-        await db.collection(COLLECTION_NAME).doc(id).delete();
+        await db().collection(COLLECTION_NAME).doc(id).delete();
 
         return Response.json({ success: true });
     } catch (error) {

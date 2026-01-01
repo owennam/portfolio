@@ -4,7 +4,7 @@ const COLLECTION_NAME = 'history';
 
 export async function GET() {
     try {
-        const snapshot = await db.collection(COLLECTION_NAME).orderBy('date', 'asc').get();
+        const snapshot = await db().collection(COLLECTION_NAME).orderBy('date', 'asc').get();
         const history = snapshot.docs.map(doc => doc.data());
         return Response.json(history);
     } catch (error) {
@@ -39,10 +39,10 @@ export async function POST(request) {
         };
 
         // Use date as Document ID for easy upsert and uniqueness
-        await db.collection(COLLECTION_NAME).doc(date).set(newEntry, { merge: true });
+        await db().collection(COLLECTION_NAME).doc(date).set(newEntry, { merge: true });
 
         // Retrieve full sorted history to return (legacy behavior expected by frontend)
-        const snapshot = await db.collection(COLLECTION_NAME).orderBy('date', 'asc').get();
+        const snapshot = await db().collection(COLLECTION_NAME).orderBy('date', 'asc').get();
         const history = snapshot.docs.map(doc => doc.data());
 
         return Response.json({ success: true, history });

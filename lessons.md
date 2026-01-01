@@ -158,6 +158,26 @@ db().collection('users').get();  // 함수로 호출!
 
 ---
 
+### 3. Vercel 배포 404 에러 (2026-01-02)
+**문제**:
+- 배포 성공 (`200 OK`) 로그가 뜨지만, 실제 사이트 접속 시 404 페이지 표시
+- Vercel이 빌드 결과물을 올바른 경로에서 찾지 못함
+
+**원인**:
+- **Root Directory 설정 오류**: 프로젝트가 레포지토리 최상위(`root`)에 있는데, Vercel 설정에서 `portfolio`라는 하위 폴더를 바라보게 설정됨
+- `package.json`이 있는 위치가 Root Directory여야 함
+
+**해결**:
+1. Vercel Dashboard > Settings > Build and Deployment
+2. **Root Directory** 항목을 **빈칸**으로 수정 (기본값)
+3. Redeploy
+
+**교훈**:
+- "Root Directory"는 `package.json`이 있는 위치를 기준
+- 모노레포가 아니라면 보통 빈칸이 정답
+
+---
+
 ## 🎯 프로젝트 특수 규칙
 
 ### Yahoo Finance API 사용

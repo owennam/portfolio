@@ -15,8 +15,8 @@ export async function GET(request) {
 
         // 1. Load Data from Firestore
         const [tradesSnapshot, journalsSnapshot] = await Promise.all([
-            db.collection('trades').get(),
-            db.collection('journals').orderBy('date', 'desc').get()
+            db().collection('trades').get(),
+            db().collection('journals').orderBy('date', 'desc').get()
         ]);
 
 

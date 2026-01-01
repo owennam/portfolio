@@ -11,7 +11,7 @@ export async function GET(request) {
         }
 
         // 1. Read Trades from Firestore
-        const snapshot = await db.collection('trades').get();
+        const snapshot = await db().collection('trades').get();
         const trades = snapshot.docs.map(doc => doc.data());
 
         // 2. Calculate Holdings
