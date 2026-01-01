@@ -1,8 +1,6 @@
 import yahooFinance from 'yahoo-finance2';
 
-// yahoo-finance2 is used directly, not instantiated
-// Suppress survey notice
-yahooFinance.suppressNotices(['yahooSurvey']);
+// yahoo-finance2 is used directly as a module
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
