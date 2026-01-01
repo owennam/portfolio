@@ -1,6 +1,7 @@
-import yahooFinance from 'yahoo-finance2';
+import YahooFinance from 'yahoo-finance2';
 
-// yahoo-finance2 is used directly as a module
+// yahoo-finance2 v3 requires instantiation
+const yahooFinance = new YahooFinance();
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -9,8 +10,6 @@ export async function GET(request) {
     if (!tickers || tickers.length === 0) {
         return Response.json({ error: 'No tickers provided' }, { status: 400 });
     }
-
-    const errors = []; // Collect errors for debugging
 
     // Process all tickers in parallel to stay within Vercel's 10s timeout
     const results = await Promise.all(
@@ -49,13 +48,8 @@ export async function GET(request) {
                                 shortName: quote.shortName,
                                 quoteType: quote.quoteType,
                             };
-                        } catch (e3) {
-                            errors.push({ ticker, error: e3.message });
-                        }
+                        } catch (e3) { }
                     }
-                } else {
-                    // Log the actual error for debugging
-                    errors.push({ ticker, error: e.message || String(e) });
                 }
                 return { ticker, error: 'Failed to fetch' };
             }
@@ -63,14 +57,5 @@ export async function GET(request) {
     );
 
     const validResults = results.filter(r => r && !r.error && typeof r.price === 'number' && r.price > 0);
-
-    // Return errors in debug mode for troubleshooting
-    if (validResults.length === 0 && errors.length > 0) {
-        return Response.json({
-            data: [],
-            debug: errors.slice(0, 5) // Return first 5 errors for diagnosis
-        });
-    }
-
     return Response.json(validResults);
 }
