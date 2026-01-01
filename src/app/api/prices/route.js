@@ -1,9 +1,8 @@
 import yahooFinance from 'yahoo-finance2';
-// Suppress survey notice to keep logs clean
-const yf = new yahooFinance({
-    logger: { info: () => { }, warn: () => { }, error: (...args) => console.error(...args) }
-});
-// Alternatively, just ignore known notices if config allows, but custom logger is safer.
+
+// yahoo-finance2 is used directly, not instantiated
+// Suppress survey notice
+yahooFinance.suppressNotices(['yahooSurvey']);
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -30,7 +29,7 @@ export async function GET(request) {
         const chunkResults = await Promise.all(
             chunk.map(async (ticker) => {
                 try {
-                    const quote = await yf.quote(ticker);
+                    const quote = await yahooFinance.quote(ticker);
                     return {
                         ticker,
                         price: quote.regularMarketPrice,
@@ -43,7 +42,7 @@ export async function GET(request) {
                     // Failover logic for Korean stocks
                     if (/^[0-9A-Z]{6}$/.test(ticker)) {
                         try {
-                            const quote = await yf.quote(ticker + '.KS');
+                            const quote = await yahooFinance.quote(ticker + '.KS');
                             return {
                                 ticker,
                                 price: quote.regularMarketPrice,
@@ -54,7 +53,7 @@ export async function GET(request) {
                             };
                         } catch (e2) {
                             try {
-                                const quote = await yf.quote(ticker + '.KQ');
+                                const quote = await yahooFinance.quote(ticker + '.KQ');
                                 return {
                                     ticker,
                                     price: quote.regularMarketPrice,
