@@ -190,6 +190,7 @@
   },
   {
     "date": "2025-12-26",
+<<<<<<< Updated upstream
     "totalValue": 1801885025.5239477,
     "investedAmount": 1712846229.4641,
     "netWorth": 3448463176.5239477,
@@ -218,6 +219,12 @@
     "investedAmount": 1709935156.8475468,
     "netWorth": 3427519335.416847,
     "totalAssets": 4327051551.416847,
+=======
+    "totalValue": 1790806585.8298118,
+    "investedAmount": 1700061559.4750998,
+    "netWorth": 3437384736.829812,
+    "totalAssets": 4336916952.829812,
+>>>>>>> Stashed changes
     "liabilities": 899532216
   }
 ]

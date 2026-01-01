@@ -8,6 +8,7 @@ import MarketIndices from '@/components/Dashboard/MarketIndices';
 import { calculatePortfolioStats } from '@/lib/portfolioUtils';
 import Login from '@/components/Auth/Login';
 import { useAuth } from '@/contexts/AuthContext';
+import { logError } from '@/lib/logger';
 
 function LandingHero() {
     return (
@@ -83,7 +84,7 @@ export default function Home() {
             setManualAssets(await resAssets.json());
             setLiabilities(await resLiabilities.json());
         } catch (error) {
-            console.error('Failed to fetch data', error);
+            logError('Failed to fetch data', error);
         }
     };
 
@@ -112,7 +113,7 @@ export default function Home() {
                 const rate = data.find(p => p.ticker === 'KRW=X');
                 if (rate) setExchangeRate(rate.price);
             } catch (error) {
-                console.error('Failed to fetch prices', error);
+                logError('Failed to fetch prices', error);
             } finally {
                 setDataLoading(false);
             }
@@ -161,7 +162,7 @@ export default function Home() {
                         .then(data => {
                             if (data.history) setHistory(data.history);
                         })
-                        .catch(err => console.error('Failed to auto-save history', err));
+                        .catch(err => logError('Failed to auto-save history', err));
                 });
             }
         }

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '@/contexts/AuthContext';
+import { logError, logWarn, logDebug } from '@/lib/logger';
 
 export default function JournalSection({ stats, trades, history, globalStats }) {
     const [journal, setJournal] = useState('');
@@ -17,7 +18,7 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
     const handleGenerate = async () => {
         // Validation: Warn if data seems missing but allow proceed (might be fresh user)
         if (!stats.totalValue && !globalStats?.totalAssets) {
-            console.warn('Generating journal with 0 assets.');
+            logWarn('Generating journal with 0 assets.');
         }
 
         setLoading(true);
@@ -59,7 +60,7 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
                 throw new Error(data.details || data.error);
             }
         } catch (error) {
-            console.error('Failed to generate journal', error);
+            logError('Failed to generate journal', error);
             showToast(`일지 생성 실패: ${error.message}`, 'error');
         } finally {
             setLoading(false);
@@ -70,7 +71,7 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
     const { user } = useAuth();
 
     const handleSave = async () => {
-        console.log('handleSave called');
+        logDebug('handleSave called');
         if (!journal) {
             showToast('저장할 일지가 없습니다', 'error');
             return;
@@ -83,7 +84,7 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
 
         try {
             const today = new Date().toLocaleDateString('en-CA');
-            console.log('Saving journal for date:', today);
+            logDebug('Saving journal for date:', today);
 
             const token = await user.getIdToken();
             const res = await fetch('/api/journal', {
@@ -98,10 +99,10 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
                 })
             });
 
-            console.log('Response status:', res.status);
+            logDebug('Response status:', res.status);
 
             if (res.ok) {
-                console.log('Save successful');
+                logDebug('Save successful');
                 showToast('✅ 투자 일지가 저장되었습니다!', 'success');
             } else {
                 const errorText = await res.text();
@@ -109,12 +110,12 @@ export default function JournalSection({ stats, trades, history, globalStats }) 
                 if (res.status === 401) {
                     showToast('권한이 없습니다 (로그인 필요)', 'error');
                 } else {
-                    console.error('Save failed:', res.status, errorText);
+                    logError('Save failed:', new Error(errorText), { status: res.status });
                     showToast('저장 실패', 'error');
                 }
             }
         } catch (error) {
-            console.error('Failed to save journal', error);
+            logError('Failed to save journal', error);
             showToast('오류 발생', 'error');
         }
     };

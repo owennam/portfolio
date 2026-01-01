@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db, verifyAuth } from '@/lib/firebaseAdmin';
+import { logError } from '@/lib/logger';
 
 const COLLECTION_NAME = 'journals';
 
@@ -18,7 +19,7 @@ export async function POST(request) {
         }
 
         // Check if entry for date exists
-        const snapshot = await db.collection(COLLECTION_NAME).where('date', '==', date).limit(1).get();
+        const snapshot = await db().collection(COLLECTION_NAME).where('date', '==', date).limit(1).get();
 
         let docRef;
         let newEntry;
@@ -42,25 +43,25 @@ export async function POST(request) {
                 content,
                 updatedAt: new Date().toISOString()
             };
-            await db.collection(COLLECTION_NAME).doc(id).set(newEntry);
+            await db().collection(COLLECTION_NAME).doc(id).set(newEntry);
         }
 
         return NextResponse.json({ success: true, journal: newEntry });
 
     } catch (error) {
-        console.error('Failed to save journal:', error);
+        logError('Failed to save journal', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
-export async function GET(request) {
+export async function GET() {
     try {
-        const snapshot = await db.collection(COLLECTION_NAME).orderBy('date', 'desc').get();
+        const snapshot = await db().collection(COLLECTION_NAME).orderBy('date', 'desc').get();
         const journals = snapshot.docs.map(doc => doc.data());
 
         return NextResponse.json({ journals });
     } catch (error) {
-        console.error('Failed to fetch journals:', error);
+        logError('Failed to fetch journals', error);
         return NextResponse.json({ error: 'Failed to fetch journals' }, { status: 500 });
     }
 }

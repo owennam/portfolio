@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { calculatePortfolioStats, normalizeTicker } from '@/lib/portfolioUtils';
 import { Trash2 } from 'lucide-react';
+import { logError } from '@/lib/logger';
 
 export default function RebalancingPage() {
     const [assets, setAssets] = useState([]);
@@ -119,7 +120,7 @@ export default function RebalancingPage() {
                 setSimulationAssets(restoredSimAssets);
 
             } catch (error) {
-                console.error('Failed to fetch data', error);
+                logError('Failed to fetch data', error);
             } finally {
                 setLoading(false);
             }
@@ -145,7 +146,7 @@ export default function RebalancingPage() {
             });
             alert('목표 비중이 저장되었습니다.');
         } catch (error) {
-            console.error('Failed to save targets', error);
+            logError('Failed to save targets', error);
             alert('저장 실패');
         } finally {
             setSaving(false);
@@ -208,7 +209,7 @@ export default function RebalancingPage() {
                 alert('종목을 찾을 수 없습니다.');
             }
         } catch (error) {
-            console.error('Failed to add asset', error);
+            logError('Failed to add asset', error);
             alert('종목 추가 실패');
         } finally {
             setAddingAsset(false);

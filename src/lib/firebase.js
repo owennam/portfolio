@@ -12,9 +12,28 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Lazy initialization to prevent build-time errors
+function initializeFirebaseApp() {
+    if (getApps().length === 0 && firebaseConfig.apiKey) {
+        return initializeApp(firebaseConfig);
+    }
+    return getApps()[0];
+}
 
-export { app, auth, db };
+// Export getter instances
+let _app, _auth, _db;
+
+export const app = () => {
+    if (!_app) _app = initializeFirebaseApp();
+    return _app;
+};
+
+export const auth = () => {
+    if (!_auth && app()) _auth = getAuth(app());
+    return _auth;
+};
+
+export const db = () => {
+    if (!_db && app()) _db = getFirestore(app());
+    return _db;
+};
