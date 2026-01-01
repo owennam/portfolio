@@ -8,12 +8,18 @@ const COLLECTION_NAME = 'trades';
 export async function GET() {
   // GET is public (read-only)
   try {
-    const snapshot = await db().collection(COLLECTION_NAME).orderBy('createdAt', 'desc').get();
+    // Fetch all docs without ordering to avoid index requirement errors
+    const snapshot = await db().collection(COLLECTION_NAME).get();
     const trades = snapshot.docs.map(doc => doc.data());
+
+    // Sort in memory (descending by createdAt)
+    trades.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
     return Response.json(trades);
   } catch (error) {
     logError('Failed to fetch trades from Firestore', error);
-    return Response.json({ error: 'Failed to fetch trades' }, { status: 500 });
+    // Return empty array instead of error object to prevent client crash
+    return Response.json([]);
   }
 }
 
