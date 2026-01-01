@@ -10,37 +10,35 @@ export async function GET(request) {
         return Response.json({ error: 'No tickers provided' }, { status: 400 });
     }
 
-    // 429 Prevention: Fetch sequentially with small delay between groups
-    // Batching (yf.quote(['A','B'])) is fragile and fails if ANY ticker is invalid.
-    // So we fetch individually but with concurrency control.
-
-    // Split into chunks of 3 to process in parallel, then wait.
-    const chunkSize = 3;
-    const chunks = [];
-    for (let i = 0; i < tickers.length; i += chunkSize) {
-        chunks.push(tickers.slice(i, i + chunkSize));
-    }
-
-    const results = [];
-
-    for (const chunk of chunks) {
-        const chunkResults = await Promise.all(
-            chunk.map(async (ticker) => {
-                try {
-                    const quote = await yahooFinance.quote(ticker);
-                    return {
-                        ticker,
-                        price: quote.regularMarketPrice,
-                        changePercent: quote.regularMarketChangePercent,
-                        currency: quote.currency,
-                        shortName: quote.shortName,
-                        quoteType: quote.quoteType,
-                    };
-                } catch (e) {
-                    // Failover logic for Korean stocks
-                    if (/^[0-9A-Z]{6}$/.test(ticker)) {
+    // Process all tickers in parallel to stay within Vercel's 10s timeout
+    const results = await Promise.all(
+        tickers.map(async (ticker) => {
+            try {
+                const quote = await yahooFinance.quote(ticker);
+                return {
+                    ticker,
+                    price: quote.regularMarketPrice,
+                    changePercent: quote.regularMarketChangePercent,
+                    currency: quote.currency,
+                    shortName: quote.shortName,
+                    quoteType: quote.quoteType,
+                };
+            } catch (e) {
+                // Failover logic for Korean stocks (6-digit codes)
+                if (/^[0-9A-Z]{6}$/.test(ticker)) {
+                    try {
+                        const quote = await yahooFinance.quote(ticker + '.KS');
+                        return {
+                            ticker,
+                            price: quote.regularMarketPrice,
+                            changePercent: quote.regularMarketChangePercent,
+                            currency: quote.currency,
+                            shortName: quote.shortName,
+                            quoteType: quote.quoteType,
+                        };
+                    } catch (e2) {
                         try {
-                            const quote = await yahooFinance.quote(ticker + '.KS');
+                            const quote = await yahooFinance.quote(ticker + '.KQ');
                             return {
                                 ticker,
                                 price: quote.regularMarketPrice,
@@ -49,32 +47,14 @@ export async function GET(request) {
                                 shortName: quote.shortName,
                                 quoteType: quote.quoteType,
                             };
-                        } catch (e2) {
-                            try {
-                                const quote = await yahooFinance.quote(ticker + '.KQ');
-                                return {
-                                    ticker,
-                                    price: quote.regularMarketPrice,
-                                    changePercent: quote.regularMarketChangePercent,
-                                    currency: quote.currency,
-                                    shortName: quote.shortName,
-                                    quoteType: quote.quoteType,
-                                };
-                            } catch (e3) { }
-                        }
+                        } catch (e3) { }
                     }
-                    console.error(`Failed to fetch ${ticker}`, e.message);
-                    return { ticker, error: 'Failed to fetch' };
                 }
-            })
-        );
-        results.push(...chunkResults);
-
-        // Wait 200ms between chunks to be nice to Yahoo API
-        if (chunks.indexOf(chunk) < chunks.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-        }
-    }
+                // Silently fail for individual tickers
+                return { ticker, error: 'Failed to fetch' };
+            }
+        })
+    );
 
     const validResults = results.filter(r => r && !r.error && typeof r.price === 'number' && r.price > 0);
     return Response.json(validResults);
