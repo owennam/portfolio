@@ -13,45 +13,22 @@ export async function GET(request) {
         return Response.json({ error: 'No tickers provided' }, { status: 400 });
     }
 
-    // Split into simple (batchable) and complex (retry-needed) tickers
-    const simpleTickers = [];
-    const complexTickers = []; // 6-digit codes that might need .KS/.KQ suffix
+    // 429 Prevention: Fetch sequentially with small delay between groups
+    // Batching (yf.quote(['A','B'])) is fragile and fails if ANY ticker is invalid.
+    // So we fetch individually but with concurrency control.
 
-    tickers.forEach(t => {
-        if (/^[0-9A-Z]{6}$/.test(t)) {
-            complexTickers.push(t);
-        } else {
-            simpleTickers.push(t);
-        }
-    });
+    // Split into chunks of 3 to process in parallel, then wait.
+    const chunkSize = 3;
+    const chunks = [];
+    for (let i = 0; i < tickers.length; i += chunkSize) {
+        chunks.push(tickers.slice(i, i + chunkSize));
+    }
 
     const results = [];
 
-    // 1. Batch Simple Tickers
-    if (simpleTickers.length > 0) {
-        try {
-            const batchResults = await yf.quote(simpleTickers, { return: 'array' });
-            batchResults.forEach(quote => {
-                results.push({
-                    ticker: quote.symbol,
-                    price: quote.regularMarketPrice,
-                    changePercent: quote.regularMarketChangePercent,
-                    currency: quote.currency,
-                    shortName: quote.shortName,
-                    quoteType: quote.quoteType,
-                });
-            });
-        } catch (e) {
-            console.error('Batch fetch failed, falling back to individual', e);
-            // Fallback: Add to complexTickers to try individually
-            complexTickers.push(...simpleTickers);
-        }
-    }
-
-    // 2. Process Complex Tickers (or fallback) Individually
-    if (complexTickers.length > 0) {
-        const individualResults = await Promise.all(
-            complexTickers.map(async (ticker) => {
+    for (const chunk of chunks) {
+        const chunkResults = await Promise.all(
+            chunk.map(async (ticker) => {
                 try {
                     const quote = await yf.quote(ticker);
                     return {
@@ -63,7 +40,7 @@ export async function GET(request) {
                         quoteType: quote.quoteType,
                     };
                 } catch (e) {
-                    // Retry logic for 6-digit codes
+                    // Failover logic for Korean stocks
                     if (/^[0-9A-Z]{6}$/.test(ticker)) {
                         try {
                             const quote = await yf.quote(ticker + '.KS');
@@ -89,12 +66,17 @@ export async function GET(request) {
                             } catch (e3) { }
                         }
                     }
-                    console.error(`Failed to fetch ${ticker}`, e);
+                    console.error(`Failed to fetch ${ticker}`, e.message);
                     return { ticker, error: 'Failed to fetch' };
                 }
             })
         );
-        results.push(...individualResults);
+        results.push(...chunkResults);
+
+        // Wait 200ms between chunks to be nice to Yahoo API
+        if (chunks.indexOf(chunk) < chunks.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
     }
 
     const validResults = results.filter(r => r && !r.error && typeof r.price === 'number' && r.price > 0);
