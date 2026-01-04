@@ -178,19 +178,172 @@ db().collection('users').get();  // 함수로 호출!
 
 ---
 
+### 4. Firebase Admin 환경 변수 미설정 (2026-01-02)
+**문제**:
+```
+GET /api/assets 500 (Internal Server Error)
+{error: "Failed to read assets"}
+```
+
+**원인**:
+- API routes가 Firebase Admin SDK를 사용하려 했으나 서버 측 환경 변수 미설정
+- `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` 누락
+- 로컬 개발 환경에서 `db()`가 `undefined` 반환
+
+**해결**:
+Firebase Admin 대신 **로컬 JSON 파일 저장소**로 전환:
+
+```javascript
+// Before (Firebase Admin - 환경 변수 필요)
+import { db } from '@/lib/firebaseAdmin';
+const snapshot = await db().collection('trades').get();
+
+// After (Local JSON - 환경 변수 불필요)
+import { promises as fs } from 'fs';
+const data = await fs.readFile('data/trades.json', 'utf8');
+const trades = JSON.parse(data);
+```
+
+**영향받은 파일**:
+- `/api/assets/route.js`
+- `/api/liabilities/route.js`
+- `/api/trades/route.js`
+- `/api/history/route.js`
+
+**교훈**:
+1. 로컬 개발 환경에서는 간단한 파일 시스템이 더 효율적
+2. 배포 환경과 개발 환경을 분리해서 관리
+3. API 에러 시 서버 로그를 먼저 확인
+
+---
+
+### 5. Yahoo Finance Rate Limit 초과 (2026-01-02)
+**문제**:
+- Yahoo Finance API에서 빈 응답 반환
+- 무료 API라 명시적 rate limit은 없지만 과도한 요청 시 차단
+
+**해결**:
+**Alpha Vantage**로 전환 + 공격적인 캐싱:
+
+```javascript
+// 캐시 전략
+setCachedPrice(ticker, data, 3600); // 1시간 캐시
+
+// API 한도: 25 calls/day
+// 1시간 캐시 = 하루 최대 24회 호출 = 안전
+```
+
+**교훈**:
+- 무료 API는 항상 백업 플랜 필요
+- 캐싱은 성능뿐 아니라 생존 전략
+- API 한도를 문서화하고 모니터링
+
+---
+
+### 6. Python 경로 문제 (Windows) (2026-01-02)
+**문제**:
+```
+Error: Python script exited with code 9
+```
+
+**원인**:
+- Node.js에서 `python3` 명령어 실행 시도
+- Windows에서는 `python3`가 아닌 `python` 사용
+
+**해결**:
+```javascript
+// Before
+const PYTHON_PATH = process.env.PYTHON_PATH || 'python3';
+
+// After (Windows 호환)
+const PYTHON_PATH = process.env.PYTHON_PATH || 'python';
+```
+
+**교훈**:
+1. 크로스 플랫폼 호환성 고려
+2. 환경 변수로 유연하게 설정 가능하도록
+3. 에러 코드로 문제 원인 추적
+
+---
+
+### 7. Array.isArray() 검증 누락 (2026-01-02)
+**문제**:
+```
+TypeError: manualAssets.filter is not a function
+```
+
+**원인**:
+- API 응답이 실패하면 객체 `{error: "..."}` 반환
+- 클라이언트가 배열이라 가정하고 `.filter()` 호출
+
+**해결**:
+```javascript
+// Before
+setManualAssets(await resAssets.json());
+
+// After (방어 코드)
+const assetsData = await resAssets.json();
+setManualAssets(Array.isArray(assetsData) ? assetsData : []);
+```
+
+**영향범위**: `trades`, `history`, `manualAssets`, `liabilities` 모든 state
+
+**교훈**:
+- API 응답은 항상 검증
+- 타입 안전성 확보 (TypeScript 사용 시 더 좋음)
+- 에러 객체와 정상 데이터 구조 통일
+
+---
+
 ## 🎯 프로젝트 특수 규칙
 
-### Yahoo Finance API 사용
-- **라이브러리**: `yahoo-finance2` 사용
-- **주의사항**: API 호출 빈도 제한이 있으므로 캐싱 고려
+### 가격 데이터 API 사용
+- **미국 주식**: Alpha Vantage (`yahoo-finance2` → `alphavantage` 전환)
+  - 한도: 25 calls/day
+  - 캐시: 1시간
+- **한국 주식**: PyKRX (Python 라이브러리)
+  - 한도: 무제한
+  - 캐시: 15분
+- **암호화폐**: CoinMarketCap
+  - 한도: 10,000 calls/month (Basic plan)
+  - 캐시: 30분
+- **주의사항**: 캐싱은 필수! API 한도 초과 방지
 
 ### 데이터 구조
 - **Google Sheets 연동**: `/src/lib/googleSheets.js` 참조
-- **거래 기록**: `/data/` 폴더의 JSON 파일로 관리
+- **거래 기록**: `/data/` 폴더의 JSON 파일로 관리 (로컬 개발)
+
+### Python 통합 (한국 주식)
+- **스크립트**: `/python/fetch_kr_prices.py`
+- **의존성**: PyKRX, pandas, numpy
+- **호출 방식**: Node.js `child_process.spawn()`
+- **환경 변수**: `PYTHON_PATH` (기본값: `python`)
 
 ---
 
 ## 📝 작업 이력
+
+- **2026-01-02 (오후)**: 멀티소스 가격 API 아키텍처 구축
+  - ✅ 티커 자동 분류 시스템 (`tickerUtils.js`)
+  - ✅ 3개 Price Provider 구현:
+    - `alphaVantage.js` - 미국 주식 (1시간 캐시)
+    - `koreanStocks.js` - 한국 주식 + Python 통합 (15분 캐시)
+    - `coinMarketCap.js` - 암호화폐 (30분 캐시)
+  - ✅ Python 백엔드 통합 (PyKRX)
+    - `python/fetch_kr_prices.py` 생성
+    - `python/requirements.txt` 생성
+    - setuptools 설치 (Python 3.13 호환성)
+  - ✅ 캐싱 레이어 개선 (맞춤 TTL 지원)
+  - ✅ 메인 API 리팩토링 (`/api/prices/route.js`)
+  - ✅ 테스트 완료: 6개 자산 × 3개 소스 = 18개 경로 검증
+  - **성과**: API 비용 $0, 모든 자산군 실시간 가격 조회 성공
+
+- **2026-01-02 (오전)**: Firebase 환경 변수 설정 및 로컬 데이터 마이그레이션
+  - ✅ `.env.local` 파일 생성 (Firebase client 설정)
+  - ✅ Firebase 초기화 검증 로직 추가
+  - ✅ Firebase Admin → 로컬 JSON 파일로 전환 (4개 API)
+  - ✅ 배열 검증 로직 추가 (`Array.isArray()`)
+  - **성과**: 로컬 개발 서버 정상 작동
 
 - **2026-01-02**: 에러 로깅 시스템 구축 및 Firebase 빌드 수정
   - ✅ `src/lib/logger.ts` 생성 (TypeScript, 중앙화된 로깅)
@@ -209,4 +362,147 @@ db().collection('users').get();  // 함수로 호출!
 
 ---
 
-**💡 TIP**: 각 작업 세션이 끝날 때마다 회고(Retrospective)를 통해 이 파일을 업데이트하세요!
+### 8. Private Key 환경 변수 처리 (2026-01-02)
+**문제**:
+```
+Error: 16 UNAUTHENTICATED: Request had invalid authentication credentials.
+```
+- `.env` 파일에 RSA Private Key(`-----BEGIN...`)를 저장할 때 줄바꿈(`\n`) 처리가 깨짐.
+- Copy/Paste 과정에서 공백이 들어가거나 개행이 문자열로 취급됨.
+
+**해결**:
+1. **파일 직접 로드**: `serviceAccountKey.json` 파일을 `.gitignore` 처리 후 직접 읽기.
+2. **Base64 인코딩**: Private Key 전체를 Base64로 인코딩해서 환경 변수에 저장하고 코드에서 디코딩.
+
+**교훈**:
+- 다중 라인 비밀키(Certificate 등)는 환경 변수로 다루기 까다롭다.
+- 개발 환경에서는 보안이 보장된다면(gitignore) JSON 키 파일을 직접 쓰는 것이 정신 건강에 이롭다.
+
+---
+
+### 9. Provider 패턴의 유용성 (2026-01-02)
+**상황**:
+- Yahoo Finance rate limit 문제로 Alpha Vantage로 교체했으나, 하루 25회 제한으로 다시 문제 발생.
+- 결국 Yahoo Finance로 다시 복귀 결정.
+
+**성과**:
+- `fetchUSStocks` 함수 인터페이스를 동일하게 유지한 덕분에, `route.js`의 변경 없이 Provider 모듈(`import`)만 교체하여 해결.
+- **Dependency Inversion** 원칙이 실무에서 빛을 발함.
+
+**교훈**:
+- 외부 API는 언제든 바뀔 수 있다. 반드시 추상화 계층(Wrapper)을 두어라.
+
+---
+
+## 🎯 프로젝트 특수 규칙
+
+### 가격 데이터 API 사용
+- **미국 주식/지수/환율**: **Yahoo Finance** (`yahoo-finance2`) - *Main*
+- **한국 주식**: PyKRX (Python 라이브러리)
+- **암호화폐**: CoinMarketCap (Basic plan)
+- **Alpha Vantage**: *Deprecated* (Backup용으로 보존)
+
+### 데이터 구조
+- **Google Sheets 연동**: `/src/lib/googleSheets.js` 참조
+- **거래 기록**: `/data/` 폴더의 JSON 파일로 관리 (로컬 개발)
+  - **복구 가이드**: `scripts/sync-trades.js`를 사용하여 Firestore와 동기화 가능.
+
+### Python 통합 (한국 주식)
+- **스크립트**: `/python/fetch_kr_prices.py`
+- **의존성**: PyKRX, pandas, numpy
+- **호출 방식**: Node.js `child_process.spawn()`
+- **환경 변수**: `PYTHON_PATH` (기본값: `python`)
+
+---
+
+## 📝 작업 이력
+
+- **2026-01-02 (저녁)**: 데이터 복구 및 Yahoo Finance 복귀
+  - ✅ **Yahoo Finance 재도입**: Alpha Vantage 한도 문제 해결, 지수/환율 데이터 확보.
+  - ✅ **데이터 복구**: Firestore 동기화 스크립트 작성, 12/26~30 누락 데이터 15건 복구.
+  - ✅ **인증 해결**: 환경 변수 대신 JSON 키 파일 로드 방식으로 Firebase Admin 인증 성공.
+
+- **2026-01-02 (오후)**: 멀티소스 가격 API 아키텍처 구축
+  - ✅ 티커 자동 분류 시스템 (`tickerUtils.js`)
+  - ✅ 3개 Price Provider 구현:
+    - Alpha Vantage, Korean Stocks, CoinMarketCap
+
+### 10. Dual Storage & Sync Pattern (2026-01-03)
+**상황**:
+- 사용자가 데스크탑과 노트북을 번갈아 사용하면서 데이터 동기화를 원함.
+- 단순히 클라우드 드라이브(OneDrive 등)에 프로젝트 폴더를 넣는 것은 `node_modules` 충돌 위험.
+
+**해결**:
+1. **Dual Write**: 로컬 JSON 파일과 Firebase Firestore에 동시 저장 (`dataService.js`).
+2. **Local First**: 읽기는 항상 로컬 JSON을 사용하여 속도 보장.
+3. **Sync API**: 데이터 불일치 시 `/api/sync`를 통해 클라우드 데이터를 로컬로 덮어쓰기 기능 제공.
+
+**교훈**:
+- 물리적 파일 동기화보다 애플리케이션 레벨의 동기화가 훨씬 안정적이다.
+- 특히 `node_modules` 같은 무거운 종속성이 있는 프로젝트는 더더욱 그렇다.
+
+### 11. Ghost Data (유령 데이터) 위험성 (2026-01-03)
+**상황**:
+- 포트폴리오 수익률이 갑자기 -48%로 표기됨.
+- 원인을 찾기 위해 코드를 뒤졌으나, 범인은 `trades.json`에 숨어있던 "TEST" 종목 데이터.
+
+**해결**:
+- 디버그 스크립트로 데이터 전체 스캔 후 문제 데이터 삭제.
+
+**교훈**:
+- 테스트를 위한 더미 데이터는 반드시 `db:seed` 스크립트 등을 통해 관리하고, 운영 데이터 파일에 직접 넣지 말 것.
+- JSON 파일 기반 DB는 데이터 무결성 검증 도구가 없으므로 정기적인 검사 필요.
+
+### 12. Next.js API Imports (2026-01-03)
+**상황**:
+- `/api/ai-data` 호출 시 500 에러 발생, 로그 확인 불가.
+- 원인은 `portfolioUtils`에서 `categorizeTickers`를 import 하려 했으나, 해당 함수는 `tickerUtils`에 존재.
+
+**교훈**:
+- 자동 완성을 맹신하지 말고 Import 경로를 항상 확인.
+- Next.js API Routes에서 500 에러 시, `try/catch` 블록에서 `error.message`와 `stack`을 응답으로 내려주면 `curl`로 디버깅 가능.
+
+### 13. Journal API 500 Error - Dual Storage 누락 (2026-01-04)
+**문제**:
+```
+POST /api/journal 500 (Internal Server Error)
+{"error":"Internal Server Error"}
+```
+- `JournalSection`에서 저장 버튼 클릭 시 500 에러 발생.
+
+**원인**:
+- `/api/journal/route.js`가 Firebase Admin SDK(`db()`)를 직접 사용.
+- 로컬 환경에서 Firebase credentials 미설정 시 `db()`가 `undefined` 반환.
+- 다른 API들(`trades`, `history`)은 이미 Dual Storage 패턴을 사용 중이었으나, `journal` API는 누락.
+
+**해결**:
+```javascript
+// Before (Firebase 직접 사용 - credentials 없으면 에러)
+const snapshot = await db().collection('journals').where('date', '==', date).get();
+
+// After (Local-first + Firebase background sync)
+const journals = await getLocalJournals(); // data/journals.json
+const index = journals.findIndex(j => j.date === date);
+// ... upsert logic ...
+await saveLocalJournals(journals);
+syncToFirebase(newEntry).catch(err => logError('Firebase Sync Error', err));
+```
+
+**교훈**:
+1. 새 API route 작성 시 기존 패턴(Dual Storage)을 따르는지 확인.
+2. Firebase 의존 코드는 항상 fallback 로직 필요.
+3. `db()`가 `undefined`일 수 있음을 전제로 코딩.
+
+---
+
+## 📝 작업 이력 (계속)
+
+- **2026-01-04**: Journal API 500 에러 수정
+  - ✅ **Dual Storage 적용**: `/api/journal/route.js`에 로컬 JSON + Firebase sync 패턴 적용.
+  - ✅ **lessons.md 회고**: 교훈 #13 추가.
+
+- **2026-01-03 (오전/오후)**: 포트폴리오 안정화 및 AI 기능 추가
+  - ✅ **Dual Storage 구축**: 로컬+클라우드 하이브리드 저장소.
+  - ✅ **AI Context API**: LLM 전용 데이터 요약 엔드포인트 완성.
+  - ✅ **Startup Script**: 원클릭 실행 배치 파일(`start-portfolio.bat`) 제공.
+  - ✅ **Bug Fix**: `0093D0` 티커 인식 문제 및 Ghost Data("TEST") 삭제.

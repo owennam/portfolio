@@ -13,6 +13,10 @@ export default function NetWorthPage() {
     // Form States
     const [assetForm, setAssetForm] = useState({ category: 'Real Estate', name: '', value: '', memo: '' });
     const [liabilityForm, setLiabilityForm] = useState({ name: '', amount: '', interestRate: '', maturityDate: '' });
+    const [editingLiability, setEditingLiability] = useState(null); // ID of liability being edited
+    const [editForm, setEditForm] = useState({ name: '', amount: '', interestRate: '', maturityDate: '' });
+    const [editingAsset, setEditingAsset] = useState(null); // ID of asset being edited
+    const [assetEditForm, setAssetEditForm] = useState({ category: 'Real Estate', name: '', value: '', memo: '' });
 
     const fetchAll = async () => {
         setLoading(true);
@@ -102,6 +106,49 @@ export default function NetWorthPage() {
         fetchAll();
     };
 
+    const handleEditAsset = (item) => {
+        setEditingAsset(item.id);
+        setAssetEditForm({
+            category: item.category,
+            name: item.name,
+            value: item.value,
+            memo: item.memo || ''
+        });
+    };
+
+    const handleUpdateAsset = async (e) => {
+        e.preventDefault();
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        try {
+            const token = await user.getIdToken();
+            const res = await fetch(`/api/assets?id=${editingAsset}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(assetEditForm)
+            });
+            if (res.ok) {
+                setEditingAsset(null);
+                setAssetEditForm({ category: 'Real Estate', name: '', value: '', memo: '' });
+                fetchAll();
+            } else {
+                alert('수정 실패: ' + res.statusText);
+            }
+        } catch (error) {
+            console.error('Failed to update asset', error);
+        }
+    };
+
+    const handleCancelAssetEdit = () => {
+        setEditingAsset(null);
+        setAssetEditForm({ category: 'Real Estate', name: '', value: '', memo: '' });
+    };
+
     const handleDeleteLiability = async (id) => {
         if (!confirm('삭제하시겠습니까?')) return;
         if (!user) {
@@ -114,6 +161,49 @@ export default function NetWorthPage() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         fetchAll();
+    };
+
+    const handleEditLiability = (item) => {
+        setEditingLiability(item.id);
+        setEditForm({
+            name: item.name,
+            amount: item.amount,
+            interestRate: item.interestRate,
+            maturityDate: item.maturityDate || ''
+        });
+    };
+
+    const handleUpdateLiability = async (e) => {
+        e.preventDefault();
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        try {
+            const token = await user.getIdToken();
+            const res = await fetch(`/api/liabilities?id=${editingLiability}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(editForm)
+            });
+            if (res.ok) {
+                setEditingLiability(null);
+                setEditForm({ name: '', amount: '', interestRate: '', maturityDate: '' });
+                fetchAll();
+            } else {
+                alert('수정 실패: ' + res.statusText);
+            }
+        } catch (error) {
+            console.error('Failed to update liability', error);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingLiability(null);
+        setEditForm({ name: '', amount: '', interestRate: '', maturityDate: '' });
     };
 
     const formatCurrency = (val) => new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(val);
@@ -193,15 +283,82 @@ export default function NetWorthPage() {
                         <h3>자산 목록</h3>
                         <div style={{ marginTop: '1rem' }}>
                             {assets.map(item => (
-                                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)' }}>
-                                    <div>
-                                        <div style={{ fontWeight: 'bold' }}>{item.name}</div>
-                                        <div className="text-sm text-muted">{item.category} {item.memo && `• ${item.memo}`}</div>
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontWeight: 'bold' }}>{formatCurrency(item.value)}</div>
-                                        <button onClick={() => handleDeleteAsset(item.id)} className="text-xs text-danger" style={{ background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem' }}>삭제</button>
-                                    </div>
+                                <div key={item.id} style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)' }}>
+                                    {editingAsset === item.id ? (
+                                        /* Edit Mode */
+                                        <form onSubmit={handleUpdateAsset} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                            <div className="grid-2" style={{ gap: '0.5rem' }}>
+                                                <select
+                                                    value={assetEditForm.category}
+                                                    onChange={e => setAssetEditForm({ ...assetEditForm, category: e.target.value })}
+                                                    className="input"
+                                                    style={{ width: '100%' }}
+                                                >
+                                                    <option value="Real Estate">부동산</option>
+                                                    <option value="Cash">현금/예금</option>
+                                                    <option value="Insurance">보험</option>
+                                                    <option value="Other">기타</option>
+                                                </select>
+                                                <input
+                                                    type="text"
+                                                    value={assetEditForm.name}
+                                                    onChange={e => setAssetEditForm({ ...assetEditForm, name: e.target.value })}
+                                                    className="input"
+                                                    placeholder="자산명"
+                                                    required
+                                                    style={{ width: '100%' }}
+                                                />
+                                            </div>
+                                            <input
+                                                type="number"
+                                                value={assetEditForm.value}
+                                                onChange={e => setAssetEditForm({ ...assetEditForm, value: e.target.value })}
+                                                className="input"
+                                                placeholder="평가액"
+                                                required
+                                                style={{ width: '100%' }}
+                                            />
+                                            <input
+                                                type="text"
+                                                value={assetEditForm.memo}
+                                                onChange={e => setAssetEditForm({ ...assetEditForm, memo: e.target.value })}
+                                                className="input"
+                                                placeholder="메모 (선택)"
+                                                style={{ width: '100%' }}
+                                            />
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>저장</button>
+                                                <button type="button" onClick={handleCancelAssetEdit} className="btn btn-outline" style={{ flex: 1 }}>취소</button>
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        /* View Mode */
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div>
+                                                <div style={{ fontWeight: 'bold' }}>{item.name}</div>
+                                                <div className="text-sm text-muted">{item.category} {item.memo && `• ${item.memo}`}</div>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontWeight: 'bold' }}>{formatCurrency(item.value)}</div>
+                                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        onClick={() => handleEditAsset(item)}
+                                                        className="text-xs"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3b82f6' }}
+                                                    >
+                                                        수정
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteAsset(item.id)}
+                                                        className="text-xs"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}
+                                                    >
+                                                        삭제
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                             {assets.length === 0 && <p className="text-muted text-center" style={{ padding: '1rem' }}>등록된 자산이 없습니다.</p>}
@@ -271,15 +428,80 @@ export default function NetWorthPage() {
                         <h3>부채 목록</h3>
                         <div style={{ marginTop: '1rem' }}>
                             {liabilities.map(item => (
-                                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)' }}>
-                                    <div>
-                                        <div style={{ fontWeight: 'bold' }}>{item.name}</div>
-                                        <div className="text-sm text-muted">{item.interestRate}% • {item.maturityDate} 만기</div>
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontWeight: 'bold', color: '#ef4444' }}>{formatCurrency(item.amount)}</div>
-                                        <button onClick={() => handleDeleteLiability(item.id)} className="text-xs text-muted" style={{ background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem' }}>삭제</button>
-                                    </div>
+                                <div key={item.id} style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)' }}>
+                                    {editingLiability === item.id ? (
+                                        /* Edit Mode */
+                                        <form onSubmit={handleUpdateLiability} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                            <input
+                                                type="text"
+                                                value={editForm.name}
+                                                onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                                                className="input"
+                                                placeholder="대출명"
+                                                required
+                                                style={{ width: '100%' }}
+                                            />
+                                            <div className="grid-2" style={{ gap: '0.5rem' }}>
+                                                <input
+                                                    type="number"
+                                                    value={editForm.amount}
+                                                    onChange={e => setEditForm({ ...editForm, amount: e.target.value })}
+                                                    className="input"
+                                                    placeholder="금액"
+                                                    required
+                                                    style={{ width: '100%' }}
+                                                />
+                                                <input
+                                                    type="number"
+                                                    value={editForm.interestRate}
+                                                    onChange={e => setEditForm({ ...editForm, interestRate: e.target.value })}
+                                                    className="input"
+                                                    placeholder="금리(%)"
+                                                    step="0.01"
+                                                    required
+                                                    style={{ width: '100%' }}
+                                                />
+                                            </div>
+                                            <input
+                                                type="date"
+                                                value={editForm.maturityDate}
+                                                onChange={e => setEditForm({ ...editForm, maturityDate: e.target.value })}
+                                                className="input"
+                                                style={{ width: '100%' }}
+                                            />
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>저장</button>
+                                                <button type="button" onClick={handleCancelEdit} className="btn btn-outline" style={{ flex: 1 }}>취소</button>
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        /* View Mode */
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div>
+                                                <div style={{ fontWeight: 'bold' }}>{item.name}</div>
+                                                <div className="text-sm text-muted">{item.interestRate}% • {item.maturityDate ? `${item.maturityDate} 만기` : '만기 없음'}</div>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontWeight: 'bold', color: '#ef4444' }}>{formatCurrency(item.amount)}</div>
+                                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        onClick={() => handleEditLiability(item)}
+                                                        className="text-xs"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3b82f6' }}
+                                                    >
+                                                        수정
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteLiability(item.id)}
+                                                        className="text-xs"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}
+                                                    >
+                                                        삭제
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                             {liabilities.length === 0 && <p className="text-muted text-center" style={{ padding: '1rem' }}>등록된 부채가 없습니다.</p>}

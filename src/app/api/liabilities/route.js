@@ -1,27 +1,45 @@
 import { v4 as uuidv4 } from 'uuid';
-import { db, verifyAuth } from '@/lib/firebaseAdmin';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { logError } from '@/lib/logger';
 
-const COLLECTION_NAME = 'liabilities';
+const DATA_FILE = path.join(process.cwd(), 'data', 'liabilities.json');
+
+// Helper to read JSON file
+async function readData() {
+    try {
+        const data = await fs.readFile(DATA_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        logError('Failed to read liabilities file', error);
+        return [];
+    }
+}
+
+// Helper to write JSON file
+async function writeData(data) {
+    try {
+        await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+    } catch (error) {
+        logError('Failed to write liabilities file', error);
+        throw error;
+    }
+}
 
 export async function GET() {
     try {
-        const snapshot = await db().collection(COLLECTION_NAME).get();
-        const data = snapshot.docs.map(doc => doc.data());
+        const data = await readData();
         return Response.json(data);
     } catch (error) {
-        console.error('Failed to fetch liabilities:', error);
+        logError('Failed to fetch liabilities', error);
         return Response.json({ error: 'Failed to read liabilities' }, { status: 500 });
     }
 }
 
 export async function POST(request) {
-    const auth = await verifyAuth(request);
-    if (!auth) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     try {
         const item = await request.json();
+        const data = await readData();
 
         const newItem = {
             id: uuidv4(),
@@ -29,32 +47,62 @@ export async function POST(request) {
             ...item, // name, amount, interestRate, maturityDate
         };
 
-        await db().collection(COLLECTION_NAME).doc(newItem.id).set(newItem);
+        data.push(newItem);
+        await writeData(data);
 
         return Response.json(newItem);
     } catch (error) {
-        console.error('Failed to save liability:', error);
+        logError('Failed to save liability', error);
         return Response.json({ error: 'Failed to save liability' }, { status: 500 });
     }
 }
 
 export async function DELETE(request) {
-    const auth = await verifyAuth(request);
-    if (!auth) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
         if (!id) return Response.json({ error: 'ID required' }, { status: 400 });
 
-        await db().collection(COLLECTION_NAME).doc(id).delete();
+        const data = await readData();
+        const filtered = data.filter(item => item.id !== id);
+        await writeData(filtered);
 
         return Response.json({ success: true });
     } catch (error) {
-        console.error('Failed to delete liability:', error);
+        logError('Failed to delete liability', error);
         return Response.json({ error: 'Failed to delete liability' }, { status: 500 });
     }
 }
+
+export async function PUT(request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
+
+        if (!id) return Response.json({ error: 'ID required' }, { status: 400 });
+
+        const updates = await request.json();
+        const data = await readData();
+
+        const index = data.findIndex(item => item.id === id);
+        if (index === -1) {
+            return Response.json({ error: 'Liability not found' }, { status: 404 });
+        }
+
+        // Update the item, preserving id and createdAt
+        data[index] = {
+            ...data[index],
+            ...updates,
+            updatedAt: new Date().toISOString()
+        };
+
+        await writeData(data);
+
+        return Response.json(data[index]);
+    } catch (error) {
+        logError('Failed to update liability', error);
+        return Response.json({ error: 'Failed to update liability' }, { status: 500 });
+    }
+}
+
